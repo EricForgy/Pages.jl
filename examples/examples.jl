@@ -1,6 +1,7 @@
 using Pages,Blink
 
 pages["/examples/pages"] = req -> open(readall,Pkg.dir("Pages","examples","PagesJL.html"))
+conditions["connected"] = Condition()
 
 """Example: Pages
 

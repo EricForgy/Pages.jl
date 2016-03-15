@@ -2,8 +2,6 @@ const pages = Dict{AbstractString,Function}() # url => req -> response
 const connections = Dict{Int,WebSocket}() # WebSocket.id => WebSocket
 const conditions = Dict{AbstractString,Condition}()
 
-conditions["connected"] = Condition()
-
 pages["/PagesJL.js"] = req -> open(readall,Pkg.dir("Pages","res","PagesJL.js"))
 
 """
