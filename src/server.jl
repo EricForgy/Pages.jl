@@ -42,4 +42,4 @@ end
 
 server = Server(http,ws)
 
-@async run(server, 8000)
+start() = @async run(server, 8000);

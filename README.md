@@ -16,6 +16,8 @@ julia> Pkg.add("Pages")
 
 ~~~julia
 julia> using Pages
+
+julia> Pages.start();
 Listening on 0.0.0.0:8000...
 ~~~
 
