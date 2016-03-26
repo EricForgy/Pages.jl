@@ -6,6 +6,10 @@ Portions based on code that is part of WebSockets, licensed under the MIT licens
 
 Copyright (c) 2013 Leah Hanson, Stefan Karpinski, Zach Allaun, Daniel Espeset
 
+Portions based on code that is part of Blink, licensed under the MIT license:
+
+Copyright (c) 2014: Mike Innes.
+
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
 "Software"), to deal in the Software without restriction, including

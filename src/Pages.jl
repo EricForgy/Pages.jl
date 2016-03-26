@@ -1,9 +1,26 @@
 module Pages
 
-using HttpServer, WebSockets, URIParser, JSON
+using HttpServer, WebSockets, URIParser, Mustache, JSON
 
-export pages
+import Base: show
 
+export pages, Endpoint, Session, Request
+
+type Endpoint
+    handler::Function
+    route::AbstractString
+
+    function Endpoint(handler,route)
+        p = new(handler,route)
+        !haskey(pages,route) || error("Page $route already exists.")
+        pages[route] = p
+        finalizer(p, p -> delete!(pages, p.route))
+        p
+    end
+end
+const pages = Dict{AbstractString,Endpoint}() # url => page
+
+include("sessions.jl")
 include("server.jl")
 
 """
@@ -16,9 +33,11 @@ sock.onmessage = function( message ){
 }
 """
 function broadcast(msg::Dict)
-    for (id,c) in connections
-        if ~c.is_closed
-            write(c, json(msg))
+    for (sid,s) in sessions
+        for (cid,c) in s.connections
+            if ~c.is_closed
+                write(c, json(msg))
+            end
         end
     end
 end
@@ -33,15 +52,15 @@ sock.onmessage = function( message ){
     console.log(msg);
 }
 """
-function message(id,msg::Dict)
-    if haskey(connections,id)
-        c = connections[id]
+function message(cid,msg::Dict)
+    if haskey(connections,cid)
+        c = connections[cid]
         if ~c.is_closed
             write(c, json(msg))
         end
     end
 end
-message(id,t,msg) = message(id,Dict("type"=>t,"data"=>msg))
+message(cid,t,msg) = message(cid,Dict("type"=>t,"data"=>msg))
 
 """
 Empty callback to notify the Server that a new page is loaded and its WebSocket is ready.

@@ -1,7 +1,11 @@
 using Pages,Blink
 
-pages["/examples/pages"] = req -> open(readall,Pkg.dir("Pages","examples","PagesJL.html"))
-conditions["connected"] = Condition()
+Pages.start()
+
+Endpoint("/examples/pages") do request::Request, session::Session
+    open(readall,Pkg.dir("Pages","examples","PagesJL.html"))
+end
+Pages.conditions["connected"] = Condition()
 
 """Example: Pages
 
@@ -67,19 +71,18 @@ julia> Pages.message(4,"script","console.log(Math.log(30))")
 ~~~
 """
 function example_pages()
-    w1 = Window(Dict(:title => "Pages: Window #1", :url => "http://localhost:8000/examples/pages"))
-    tools(w1)
-    Pages.block(()->(),"connected")
-    w2 = Window(Dict(:title => "Pages: Window #2", :url => "http://localhost:8000/examples/pages"))
-    tools(w2)
-    Pages.block(()->(),"connected")
-    w3 = Window(Dict(:title => "Pages: Window #3", :url => "http://localhost:8000/examples/pages"))
-    tools(w3)
-    Pages.block(()->(),"connected")
+    nwin = 3
+    for i = 1:nwin
+        w = Window(Dict(:title => "Pages: Window #$i", :url => "http://localhost:8000/examples/pages"))
+        tools(w)
+        Pages.block(()->(),"connected")
+    end
 
     Pages.broadcast("say","Hello everyone!")
-    for (id,conn) in Pages.connections
-        Pages.message(id,"say","You are connection #$(id).")
+    for (sid,s) in Pages.sessions
+        for (cid,c) in s.connections
+            Pages.message(cid,"say","You are connection #$(cid).")
+        end
     end
 end
 example_pages()

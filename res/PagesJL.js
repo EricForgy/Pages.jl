@@ -2,6 +2,7 @@
 
 var Pages = (function () {
 
+    var session_id = "{{session_id}}";
     var sock = new WebSocket('ws://'+window.location.host);
     sock.onmessage = function( message ){
         var msg = JSON.parse(message.data);
@@ -18,16 +19,15 @@ var Pages = (function () {
     }
 
     function notify(name) {
-        sock.send(JSON.stringify({"name":"notify","args":name}))
+        sock.send(JSON.stringify({"name":"notify","session_id":session_id,"args":name}))
     }
 
-    // Message a specified connected browser. Note: id = 0 corresponding to the server.
     function message(id,name,args) {
-        sock.send(JSON.stringify({"name":"message","args":[id,name,args]}))
+        sock.send(JSON.stringify({"name":"message","session_id":session_id,"args":[id,name,args]}))
     }
 
     function broadcast(name,args) {
-        sock.send(JSON.stringify({"name":"broadcast","args":[name,args]}))
+        sock.send(JSON.stringify({"name":"broadcast","session_id":session_id,"args":[name,args]}))
     }
 
     var addget = function (c, name) {
