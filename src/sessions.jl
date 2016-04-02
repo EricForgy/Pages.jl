@@ -1,24 +1,23 @@
 type Session
     id::AbstractString
-    page::Endpoint
-    connections::Dict{Int,WebSocket} # WebSocket.id => WebSocket
+    route::AbstractString
+    client::WebSocket
 
-    function Session(page::Endpoint)
+    function Session(route::AbstractString)
         id = uppercase(randstring(16))
         while haskey(sessions,id)
             id = uppercase(randstring(16))
         end
-        s = new(id,page,Dict{Int,WebSocket}())
+        s = new(id,route)
         sessions[id] = s
-        finalizer(s, s -> delete!(sessions, s.id))
+        pages[route].sessions[id] = s
         s
     end
 end
 function show(io::Base.IO,session::Session)
     print(io,"Session: ",
         "\n  ID: ",session.id,
-        "\n  Page: ",session.page.route,
-        "\n  Connections: ", string(session.connections))
+        "\n  Route: ",session.route)
 end
 
 const sessions = Dict{AbstractString,Session}()

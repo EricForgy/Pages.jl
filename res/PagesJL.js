@@ -30,6 +30,14 @@ var Pages = (function () {
         sock.send(JSON.stringify({"name":"broadcast","session_id":session_id,"args":[name,args]}))
     }
 
+    sock.onopen = function () {
+        notify("connected");
+    };
+
+    window.onbeforeunload = function () {
+        sock.send(JSON.stringify({"name":"unloaded","session_id":session_id,"args":session_id}))
+    };
+
     var addget = function (c, name) {
 		Object.defineProperty(c, name, {
 			get: function () { return eval(name); },

@@ -1,13 +1,13 @@
-const connections = Dict{Int,WebSocket}() # WebSocket.id => WebSocket
+# const connections = Dict{Int,WebSocket}() # WebSocket.id => WebSocket
 const conditions = Dict{AbstractString,Condition}()
 
 Endpoint("/PagesJL.js") do request::Request, session::Session
     d = Dict("session_id" => session.id)
-
     template = Mustache.template_from_file(Pkg.dir("Pages","res","PagesJL.js"))
     render(template,d)
-
 end
+conditions["connected"] = Condition()
+conditions["unloaded"] = Condition()
 
 """
 A dictionary of callbacks accessible from the server's WebSocket listener. For example:
@@ -26,10 +26,9 @@ const callbacks = Dict{AbstractString,Function}() # name => args -> f(args...)
 
 ws = WebSocketHandler() do request::Request, client::WebSocket
     while true
-        json = bytestring(read(client))
-        msg = JSON.parse(json)
-        connections[client.id] = client
-        sessions[msg["session_id"]].connections[client.id] = client
+        msg = JSON.parse(bytestring(read(client)))
+        session = sessions[msg["session_id"]]
+        session.client = client
         haskey(msg,"args") ? callbacks[msg["name"]](msg["args"]) : callbacks[msg["name"]]()
     end
 end
@@ -37,8 +36,13 @@ end
 http = HttpHandler() do request::Request, response::Response
     route = URI(request.resource).path
     if haskey(pages,route)
-        session = Session(pages[route])
-        res = Response(session.page.handler(request,session))
+        if isequal(route,"/PagesJL.js")
+            referer = URI(request.headers["Referer"]).path
+            session = Session(referer)
+            res = Response(pages[route].handler(request,session))
+        else
+            res = Response(pages[route].handler(request))
+        end
     else
         res = "Page not found."
     end

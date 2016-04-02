@@ -6,12 +6,15 @@ import Base: show
 
 export pages, Endpoint, Session, Request
 
+include("sessions.jl")
+
 type Endpoint
     handler::Function
     route::AbstractString
+    sessions::Dict{AbstractString,Session}
 
     function Endpoint(handler,route)
-        p = new(handler,route)
+        p = new(handler,route,Dict{AbstractString,WebSocket}())
         !haskey(pages,route) || error("Page $route already exists.")
         pages[route] = p
         finalizer(p, p -> delete!(pages, p.route))
@@ -20,7 +23,6 @@ type Endpoint
 end
 const pages = Dict{AbstractString,Endpoint}() # url => page
 
-include("sessions.jl")
 include("server.jl")
 
 """
@@ -52,20 +54,23 @@ sock.onmessage = function( message ){
     console.log(msg);
 }
 """
-function message(cid,msg::Dict)
-    if haskey(connections,cid)
-        c = connections[cid]
-        if ~c.is_closed
-            write(c, json(msg))
-        end
+function message(client::WebSocket,msg::Dict)
+    if ~client.is_closed
+        write(client, json(msg))
     end
 end
-message(cid,t,msg) = message(cid,Dict("type"=>t,"data"=>msg))
+message(client,t,msg) = message(client,Dict("type"=>t,"data"=>msg))
 
 """
 Empty callback to notify the Server that a new page is loaded and its WebSocket is ready.
 """
 callbacks["connected"] = () -> ()
+
+callbacks["unloaded"] = session_id -> begin
+    session = sessions[session_id]
+    delete!(pages[session.route].sessions,session_id)
+    delete!(sessions,session_id)
+end
 
 """
 Callback used to message a specified connected browser.
