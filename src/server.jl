@@ -27,9 +27,11 @@ const callbacks = Dict{AbstractString,Function}() # name => args -> f(args...)
 ws = WebSocketHandler() do request::Request, client::WebSocket
     while true
         msg = JSON.parse(bytestring(read(client)))
-        session = sessions[msg["session_id"]]
-        session.client = client
-        haskey(msg,"args") ? callbacks[msg["name"]](msg["args"]) : callbacks[msg["name"]]()
+        if haskey(sessions,msg["session_id"])
+            session = sessions[msg["session_id"]]
+            session.client = client
+            haskey(msg,"args") ? callbacks[msg["name"]](msg["args"]) : callbacks[msg["name"]]()
+        end
     end
 end
 
