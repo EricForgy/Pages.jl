@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/EricForgy/Pages.jl.svg?branch=master)](https://travis-ci.org/EricForgy/Pages.jl)
 
+Warning: This package has undergone a significant revision on master, so the README below applies to the latest tagged version.
+
 This a package designed to make playing around with (err... prototyping) web applications in Julia as easy as possible.
 
 If you have looked at the examples at [HttpServer.jl](https://github.com/JuliaWeb/HttpServer.jl) and [Mux.jl](https://github.com/JuliaWeb/Mux.jl) and find them trivially obvious, then this package is probably not for you.
