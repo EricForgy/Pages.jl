@@ -2,7 +2,7 @@ using Pages,Blink
 
 Pages.start()
 
-Endpoint("/examples/pages") do request::Request, session::Session
+Endpoint("/examples/pages") do request::Request
     open(readall,Pkg.dir("Pages","examples","PagesJL.html"))
 end
 
@@ -16,9 +16,8 @@ function example_pages()
 
     Pages.broadcast("say","Hello everyone!")
     for (sid,s) in Pages.sessions
-        for (cid,c) in s.connections
-            Pages.message(cid,"say","You are connection #$(cid).")
-        end
+        c = s.client
+        Pages.message(c,"say","You are connection #$(c.id).")
     end
 end
 example_pages()

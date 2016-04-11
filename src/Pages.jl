@@ -6,7 +6,29 @@ import Base: show
 
 export pages, Endpoint, Session, Request
 
-include("sessions.jl")
+type Session
+    id::AbstractString
+    route::AbstractString
+    client::WebSocket
+
+    function Session(route::AbstractString)
+        id = uppercase(randstring(16))
+        while haskey(sessions,id)
+            id = uppercase(randstring(16))
+        end
+        s = new(id,route)
+        sessions[id] = s
+        pages[route].sessions[id] = s
+        s
+    end
+end
+function show(io::Base.IO,session::Session)
+    print(io,"Session: ",
+        "\n  ID: ",session.id,
+        "\n  Route: ",session.route)
+end
+
+const sessions = Dict{AbstractString,Session}()
 
 type Endpoint
     handler::Function
@@ -36,10 +58,9 @@ sock.onmessage = function( message ){
 """
 function broadcast(msg::Dict)
     for (sid,s) in sessions
-        for (cid,c) in s.connections
-            if ~c.is_closed
-                write(c, json(msg))
-            end
+        c = s.client
+        if ~c.is_closed
+            write(c, json(msg))
         end
     end
 end
@@ -59,7 +80,14 @@ function message(client::WebSocket,msg::Dict)
         write(client, json(msg))
     end
 end
-message(client,t,msg) = message(client,Dict("type"=>t,"data"=>msg))
+message(client::WebSocket,t,msg) = message(client,Dict("type"=>t,"data"=>msg))
+function message(id::Int,t,msg)
+    for (sid,s) in sessions
+        if isequal(id,s.client.id)
+            message(s.client,Dict("type"=>t,"data"=>msg))
+        end
+    end
+end
 
 """
 Empty callback to notify the Server that a new page is loaded and its WebSocket is ready.
