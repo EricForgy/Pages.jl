@@ -21,11 +21,19 @@ type Session
         pages[route].sessions[id] = s
         s
     end
+
+    function Session()
+        id = uppercase(randstring(16))
+        while haskey(sessions,id)
+            id = uppercase(randstring(16))
+        end
+        new(id)
+    end
 end
 function show(io::Base.IO,session::Session)
     print(io,"Session: ",
         "\n  ID: ",session.id,
-        "\n  Route: ",session.route)
+        "\n  Route: ",isdefined(session,:route) ? session.route : "")
 end
 
 const sessions = Dict{AbstractString,Session}()

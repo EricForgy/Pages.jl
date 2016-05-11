@@ -39,8 +39,12 @@ http = HttpHandler() do request::Request, response::Response
     route = URI(request.resource).path
     if haskey(pages,route)
         if isequal(route,"/PagesJL.js")
-            referer = URI(request.headers["Referer"]).path
-            session = Session(referer)
+            if haskey(request.headers,"Referer")
+                referer = URI(request.headers["Referer"]).path
+                session = Session(referer)
+            else
+                session = Session()
+            end
             res = Response(pages[route].handler(request,session))
         else
             res = Response(pages[route].handler(request))
