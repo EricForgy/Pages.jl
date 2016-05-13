@@ -2,8 +2,6 @@
 
 [![Build Status](https://travis-ci.org/EricForgy/Pages.jl.svg?branch=master)](https://travis-ci.org/EricForgy/Pages.jl)
 
-Warning: This package has undergone a significant revision on master, so the README below applies to the latest tagged version.
-
 This a package designed to make playing around with (err... prototyping) web applications in Julia as easy as possible.
 
 If you have looked at the examples at [HttpServer.jl](https://github.com/JuliaWeb/HttpServer.jl) and [Mux.jl](https://github.com/JuliaWeb/Mux.jl) and find them trivially obvious, then this package is probably not for you.
@@ -25,31 +23,46 @@ julia> Pages.start();
 Listening on 0.0.0.0:8000...
 ~~~
 
-When launched, Pages starts a server that is listening at http://localhost:8000 and exposes a few global variables and methods. The first:
+When launched, Pages starts a server that is listening at http://localhost:8000 and exposes a few methods.
+
+The first:
 
 ~~~julia
-julia> pages
-Dict{AbstractString,Function} with 1 entry:
-  "/PagesJL.js" => (anonymous function)
+julia> Endpoint("/hello") do request::Request
+       "Hello world"
+       end
+Endpoint created at /hello.
 ~~~
 
-`pages` is a global dictionary of named pages, but what is a page? All you need to know about a page is that it takes a `Request` and produces a `Response`, i.e. a function `req -> res`. Often, the response is in the form of a string, e.g. the contents of an HTML file.
-
-Pages comes with one page already defined, i.e. `"/PagesJL.js"`. Here is the [definition](https://github.com/CoherentCapital/Pages.jl/blob/master/src/server.jl#L7):
+creates a web page at http://localhost:8000/hello that says `Hello world`. A dictionary of endpoints is contained in
 
 ~~~julia
-pages["/PagesJL.js"] = req -> open(readall,Pkg.dir("Pages","res","PagesJL.js"))
+julia> Pages.pages
+Dict{AbstractString,Pages.Endpoint} with 2 entries:
+  "/hello"      => Endpoint created at /hello.
+  "/PagesJL.js" => Endpoint created at /PagesJL.js.
 ~~~
 
-In one simple line, this says:
+Note there are two endpoints already. The one we just added plus `/PagesJL.js`. This endpoint is special and is part of Pages. It contains the JavaScript library that allows interaction between Julia and the browser. We'll discuss this in more detail below.
 
-1. If a request is sent, e.g. from your browser, to http://localhost:8000/PagesJL.js
-2. Take the request `req` and
-3. Return the contents of < your Julia package directory >/Pages/res/PagesJL.js
+For safety reasons, if an endpoint is already created, Pages will throw an error if you try to create it again. For example, if we want to augment (from the REPL) the `Hello world` example above with url parameters, we'd need to first delete the old endpoint:
 
-Try it by opening the link in your browser (after `using Pages`).
+~~~julia
+julia> delete!(Pages.pages,"/hello")
+Dict{AbstractString,Pages.Endpoint} with 1 entry:
+  "/PagesJL.js" => Endpoint created at /PagesJL.js.
 
-One nice thing about this is that we can now create pages whenever and wherever we want in our Julia code. The remaining global variables and methods are probably best explained by way of an example.
+julia> Endpoint("/hello") do request::Request
+       uri = URI(request.resource)
+       param = query_params(uri)
+       "Hello $(param["name"])."
+       end
+Endpoint created at /hello.
+~~~
+
+Opening the url http://localhost:8000/hello?name=Julia now greets you with `Hello Julia`.
+
+One nice thing about using Pages is that we can create pages whenever and wherever we want in our Julia code. The remaining dictionaries and methods are probably best explained by way of an example.
 
 ## Example
 
@@ -60,7 +73,9 @@ julia> include(Pkg.dir("Pages","examples","examples.jl"))
 The first thing this example does is add a page
 
 ~~~julia
-pages["/examples/pages"] = req -> open(readall,Pkg.dir("Pages","examples","PagesJL.html"))
+Endpoint("/examples/pages") do request::Request
+    open(readall,Pkg.dir("Pages","examples","PagesJL.html"))
+end
 ~~~
 
 Note again that a page can be added from anywhere in your Julia code and is immediately available in the browser.
@@ -128,38 +143,73 @@ The JavaScript methods `broadcast` and `message` above are implemented as callba
 
 ~~~julia
 julia> Pages.callbacks
-Dict{AbstractString,Function} with 4 entries:
-  "broadcast" => (anonymous function)
-  "message"   => (anonymous function)
-  "notify"    => (anonymous function)
+Dict{AbstractString,Pages.Callback} with 5 entries:
+  "broadcast" => Pages.Callback((anonymous function),"broadcast")
+  "message"   => Pages.Callback((anonymous function),"message")
+  "connected" => Pages.Callback((anonymous function),"connected")
+  "notify"    => Pages.Callback((anonymous function),"notify")
+  "unloaded"  => Pages.Callback((anonymous function),"unloaded")
 ~~~
 
-There are three callbacks predefined in Pages. The first two are simply:
+There are five callbacks predefined in Pages. The first two are simply:
 
 ~~~julia
-callbacks["broadcast"] = args -> broadcast(args...)
-callbacks["message"] = args -> message(args...)
+# Callback used to message a specified connected browser.
+Callback("message") do args
+    message(args...)
+end
+
+# Callback used to broadcast to all connected browsers.
+Callback("broadcast") do args
+    broadcast(args...)
+end
 ~~~
 
 Essentially, Julia listens (via WebSocket) for a JSON string of the form
 
 ~~~js
-"{\"name\":\"cbname\",\"args\":\"cbargs\"}"
+"{\"name\":\"callback_name\",\"args\":\"callback_args\"}"
 ~~~
 
-and calls the Julia function
+from any source/language that supports WebSockets and calls the Julia function
 
 ~~~julia
-callbacks[cbname](cbargs)
+callbacks[callback_name](callback_args)
 ~~~
 
-The example adds a forth callback
+The third callback is
 
 ~~~julia
-callbacks["connected"] = () -> ()
+# Empty callback to notify the Server that a new page is loaded and its WebSocket is ready.
+Callback("connected") do
+end
 ~~~
 
 This is just an empty callback used to notify Julia that a new WebSocket is connected to the server and available for communication.
+
+The forth callback is
+
+~~~julia
+# Callback used for blocking Julia control flow until notified by the WebSocket.
+Callback("notify") do name
+    if haskey(conditions,name)
+        notify(conditions[name])
+    else
+        error("""Condition "$name" was not found.""")
+    end
+end
+~~~
+
+The fifth callback is
+
+~~~julia
+# Callback used to cleanup when the browser navigates away from the page.
+Callback("unloaded") do session_id
+    session = sessions[session_id]
+    delete!(pages[session.route].sessions,session_id)
+    delete!(sessions,session_id)
+end
+~~~
 
 ### Blocking
 
@@ -169,7 +219,9 @@ For this, Pages provides a global dictionary
 
 ~~~julia
 julia> Pages.conditions
-Dict{AbstractString,Condition} with 0 entries
+Dict{AbstractString,Condition} with 2 entries:
+  "connected" => Condition(Any[])
+  "unloaded"  => Condition(Any[])
 ~~~
 
 of named conditions and the Julia function

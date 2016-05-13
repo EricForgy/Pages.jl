@@ -1,28 +1,13 @@
 # const connections = Dict{Int,WebSocket}() # WebSocket.id => WebSocket
 const conditions = Dict{AbstractString,Condition}()
+conditions["connected"] = Condition()
+conditions["unloaded"] = Condition()
 
 Endpoint("/PagesJL.js") do request::Request, session::Session
     d = Dict("session_id" => session.id)
     template = Mustache.template_from_file(Pkg.dir("Pages","res","PagesJL.js"))
     render(template,d)
 end
-conditions["connected"] = Condition()
-conditions["unloaded"] = Condition()
-
-"""
-A dictionary of callbacks accessible from the server's WebSocket listener. For example:
-
-With a callback
-
-    callback["say"] = args -> println(args...)
-
-when the WebSocket listener receives a JSON string
-
-    {"name": "say","args": "Hello World"}
-
-it will print "Hello World" to the REPL.
-"""
-const callbacks = Dict{AbstractString,Function}() # name => args -> f(args...)
 
 ws = WebSocketHandler() do request::Request, client::WebSocket
     while true
@@ -30,7 +15,7 @@ ws = WebSocketHandler() do request::Request, client::WebSocket
         if haskey(sessions,msg["session_id"])
             session = sessions[msg["session_id"]]
             session.client = client
-            haskey(msg,"args") ? callbacks[msg["name"]](msg["args"]) : callbacks[msg["name"]]()
+            haskey(msg,"args") ? callbacks[msg["name"]].callback(msg["args"]) : callbacks[msg["name"]].callback()
         end
     end
 end

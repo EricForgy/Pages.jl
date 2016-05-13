@@ -2,9 +2,7 @@ module Pages
 
 using HttpServer, WebSockets, URIParser, Mustache, JSON
 
-import Base: show
-
-export pages, Endpoint, Session, Request
+export pages, Endpoint, Session, Request, URI, query_params
 
 type Session
     id::AbstractString
@@ -30,12 +28,11 @@ type Session
         new(id)
     end
 end
-function show(io::Base.IO,session::Session)
+function Base.show(io::Base.IO,session::Session)
     print(io,"Session: ",
         "\n  ID: ",session.id,
         "\n  Route: ",isdefined(session,:route) ? session.route : "")
 end
-
 const sessions = Dict{AbstractString,Session}()
 
 type Endpoint
@@ -51,8 +48,12 @@ type Endpoint
         p
     end
 end
+function Base.show(io::Base.IO,endpoint::Endpoint)
+    print(io,"Endpoint created at $(endpoint.route).")
+end
 const pages = Dict{AbstractString,Endpoint}() # url => page
 
+include("callbacks.jl")
 include("server.jl")
 
 """
@@ -94,42 +95,6 @@ function message(id::Int,t,msg)
         if isequal(id,s.client.id)
             message(s.client,Dict("type"=>t,"data"=>msg))
         end
-    end
-end
-
-"""
-Empty callback to notify the Server that a new page is loaded and its WebSocket is ready.
-"""
-callbacks["connected"] = () -> ()
-
-callbacks["unloaded"] = session_id -> begin
-    session = sessions[session_id]
-    delete!(pages[session.route].sessions,session_id)
-    delete!(sessions,session_id)
-end
-
-"""
-Callback used to message a specified connected browser.
-"""
-callbacks["message"] = args -> begin
-    message(args...)
-end
-
-"""
-Callback used to broadcast to all connected browsers.
-"""
-callbacks["broadcast"] = args -> begin
-    broadcast(args...)
-end
-
-"""
-Callback used for blocking Julia control flow until notified by the WebSocket.
-"""
-callbacks["notify"] = name -> begin
-    if haskey(conditions,name)
-        notify(conditions[name])
-    else
-        error("""Condition "$name" was not found.""")
     end
 end
 
