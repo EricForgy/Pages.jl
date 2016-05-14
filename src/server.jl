@@ -1,3 +1,8 @@
+# Browser Window (Borrowed from Blink.jl)
+@osx_only     launch(x) = run(`open $x`)
+@linux_only   launch(x) = run(`xdg-open $x`)
+@windows_only launch(x) = run(`cmd /C start $x`)
+
 # const connections = Dict{Int,WebSocket}() # WebSocket.id => WebSocket
 const conditions = Dict{AbstractString,Condition}()
 conditions["connected"] = Condition()
