@@ -23,24 +23,25 @@ function add_div(id)
 end
 
 n = 10
-trace = scatter(;x = 1:n,y = rand(n))
+data = [scatter(;x = 1:n,y = rand(n))]
 layout = Layout(;title = "Create a new <div> and plot a single trace",
     width = 600,
     height = 300
 )
 id = "Plot1"
 add_div(id)
-Pages.broadcast("script","""Plotly.newPlot("$(id)",[$(trace)],$(layout));""")
+Pages.broadcast("script","""Plotly.newPlot("$(id)",$(data),$(layout));""")
 
 trace1 = scatter(;x = 1:n, y = rand(n))
 trace2 = scatter(;x = 1:n, y = rand(n))
+data = [trace1, trace2]
 layout = Layout(;title = "Create a new <div> and plot an array of traces",
     width = 600,
     height = 300
 )
 id = "Plot2"
 add_div(id)
-Pages.broadcast("script","""Plotly.newPlot("$(id)",[$(trace1),$(trace2)],$(layout));""")
+Pages.broadcast("script","""Plotly.newPlot("$(id)",$(data),$(layout));""")
 
 trace1 = scatter(;
     x = [1, 2, 3, 4],
@@ -57,6 +58,8 @@ trace3 = scatter(;
     y = [12, 9, 15, 12],
     mode = "lines+markers")
 
+data = [trace1, trace2, trace3]
+
 layout = Layout(;
     title = "Line and Scatter Plot",
     height = 400,
@@ -64,7 +67,7 @@ layout = Layout(;
 
 id = "Plot3"
 add_div(id)
-Pages.broadcast("script","""Plotly.newPlot("$(id)",[$(trace1),$(trace2),$(trace3)],$(layout));""")
+Pages.broadcast("script","""Plotly.newPlot("$(id)",$(data));""")
 
 country = ["Switzerland (2011)", "Chile (2013)", "Japan (2014)",
            "United States (2012)", "Slovenia (2014)", "Canada (2011)",
@@ -91,6 +94,7 @@ trace2["marker"] = Dict(:color => "rgba(204, 204, 204, 0.95)",
                        :size => 16)
 
 data = [trace1, trace2]
+
 layout = Layout(Dict{Symbol,Any}(:paper_bgcolor => "rgb(254, 247, 234)",
                                  :plot_bgcolor => "rgb(254, 247, 234)");
                 title="Votes cast for ten lowest voting age population in OECD countries",
@@ -108,7 +112,7 @@ layout = Layout(Dict{Symbol,Any}(:paper_bgcolor => "rgb(254, 247, 234)",
 
 id = "Plot4"
 add_div(id)
-Pages.broadcast("script","""Plotly.newPlot("$(id)",[$(trace1),$(trace2)],$(layout));""")
+Pages.broadcast("script","""Plotly.newPlot("$(id)",$(data),$(layout));""")
 
 end
 
