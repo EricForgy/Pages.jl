@@ -25,7 +25,9 @@ type Session
         while haskey(sessions,id)
             id = uppercase(randstring(16))
         end
-        new(id)
+        s = new(id)
+        sessions[id] = s
+        s
     end
 end
 function Base.show(io::Base.IO,session::Session)
@@ -56,5 +58,6 @@ const pages = Dict{AbstractString,Endpoint}() # url => page
 include("callbacks.jl")
 include("server.jl")
 include("api.jl")
+include("ijulia.jl")
 
 end

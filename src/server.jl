@@ -9,7 +9,7 @@ conditions["connected"] = Condition()
 conditions["unloaded"] = Condition()
 
 Endpoint("/PagesJL.js") do request::Request, session::Session
-    d = Dict("session_id" => session.id)
+    d = Dict("session_id" => session.id,"port" => port)
     template = Mustache.template_from_file(Pkg.dir("Pages","res","PagesJL.js"))
     render(template,d)
 end
@@ -47,4 +47,7 @@ end
 
 server = Server(http,ws)
 
-start(port = 8000) = @async run(server, port)
+function start(p = 8000)
+    global port = p
+    @async run(server, port)
+end

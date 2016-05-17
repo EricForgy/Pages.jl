@@ -3,7 +3,7 @@
 var Pages = (function () {
 
     var session_id = "{{session_id}}";
-    var sock = new WebSocket('ws://'+window.location.host);
+    var sock = new WebSocket('ws://127.0.0.1:{{port}}');
     sock.onmessage = function( message ){
         var msg = JSON.parse(message.data);
         var type = msg.type,
