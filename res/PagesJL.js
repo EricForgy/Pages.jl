@@ -30,6 +30,10 @@ var Pages = (function () {
         sock.send(JSON.stringify({"name":"broadcast","session_id":session_id,"args":[name,args]}))
     }
 
+    function callback(name,args) {
+        sock.send(JSON.stringify({"name":name,"session_id":session_id,"args":args}))
+    }
+
     sock.onopen = function () {
         notify("connected");
     };
@@ -52,5 +56,6 @@ var Pages = (function () {
     c = addget(c, "notify");
     c = addget(c, "message");
     c = addget(c, "broadcast");
+    c = addget(c, "callback");
 	return c;
 })();

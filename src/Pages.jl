@@ -2,7 +2,7 @@ module Pages
 
 using HttpServer, WebSockets, URIParser, Mustache, JSON
 
-export Endpoint, Session, Request, URI, query_params
+export Endpoint, Session, Callback, Request, URI, query_params
 
 type Session
     id::AbstractString
