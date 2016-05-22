@@ -62,3 +62,12 @@ function add_library(url)
         """)
     end
 end
+
+function add_div(id)
+    Pages.broadcast("script","""
+        var div = document.getElementById("$(id)");
+        if (div === null) {
+            d3.select("body").append("div").attr("id","$(id)").attr("class","js-plotly-plot");
+        };
+    """)
+end
