@@ -3,7 +3,7 @@ using Pages,Blink
 Pages.start()
 
 Endpoint("/examples/pages") do request::Request
-    open(readall,Pkg.dir("Pages","examples","PagesJL.html"))
+    open(readall,joinpath(dirname(@__FILE__),"PagesJL.html"))
 end
 
 function example_pages()

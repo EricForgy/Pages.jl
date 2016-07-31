@@ -3,7 +3,7 @@ using Pages, PlotlyJS
 Pages.start()
 
 Endpoint("/examples/plot.ly") do request::Request
-    open(readall,Pkg.dir("Pages","examples","PagesJL.html"))
+    open(readall,joinpath(dirname(@__FILE__),"PagesJL.html"))
 end
 
 Pages.launch("http://localhost:8000/examples/plot.ly")
