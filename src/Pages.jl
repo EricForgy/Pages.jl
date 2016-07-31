@@ -44,7 +44,7 @@ type Endpoint
 
     function Endpoint(handler,route)
         p = new(handler,route,Dict{AbstractString,WebSocket}())
-        !haskey(pages,route) || error("Page $route already exists.")
+        !haskey(pages,route) || warn("Page $route already exists.")
         pages[route] = p
         finalizer(p, p -> delete!(pages, p.route))
         p
