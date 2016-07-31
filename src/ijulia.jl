@@ -9,7 +9,7 @@ if isdefined(Main, :IJulia) && Main.IJulia.inited
     if !_js_loaded[1]
         session = Session()
         d = Dict("session_id" => session.id,"port" => port)
-        template = Mustache.template_from_file(Pkg.dir("Pages","res","PagesJL.js"))
+        template = Mustache.template_from_file(joinpath(dirname(@__FILE__),"..","res","PagesJL.js"))
         const _PagesJL_js = render(template,d)
 
         # println(_PagesJL_js)
