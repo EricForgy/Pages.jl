@@ -38,7 +38,7 @@ creates a web page at http://localhost:8000/hello that says `Hello world`. A dic
 
 ~~~julia
 julia> Pages.pages
-Dict{AbstractString,Pages.Endpoint} with 2 entries:
+Dict{String,Pages.Endpoint} with 2 entries:
   "/hello"      => Endpoint created at /hello.
   "/PagesJL.js" => Endpoint created at /PagesJL.js.
 ~~~
@@ -49,7 +49,7 @@ For safety reasons, if an endpoint is already created, Pages will throw an error
 
 ~~~julia
 julia> delete!(Pages.pages,"/hello")
-Dict{AbstractString,Pages.Endpoint} with 1 entry:
+Dict{String,Pages.Endpoint} with 1 entry:
   "/PagesJL.js" => Endpoint created at /PagesJL.js.
 
 julia> Endpoint("/hello") do request::Request
@@ -143,7 +143,7 @@ The JavaScript methods `broadcast` and `message` above are implemented as callba
 
 ~~~julia
 julia> Pages.callbacks
-Dict{AbstractString,Pages.Callback} with 5 entries:
+Dict{String,Pages.Callback} with 5 entries:
   "broadcast" => Pages.Callback((anonymous function),"broadcast")
   "message"   => Pages.Callback((anonymous function),"message")
   "connected" => Pages.Callback((anonymous function),"connected")
@@ -219,7 +219,7 @@ For this, Pages provides a global dictionary
 
 ~~~julia
 julia> Pages.conditions
-Dict{AbstractString,Condition} with 2 entries:
+Dict{String,Condition} with 2 entries:
   "connected" => Condition(Any[])
   "unloaded"  => Condition(Any[])
 ~~~

@@ -1,6 +1,6 @@
 type Callback
     callback::Function
-    name::AbstractString
+    name::String
 
     function Callback(callback,name)
         cb = new(callback,name)
@@ -9,7 +9,7 @@ type Callback
         cb
     end
 end
-const callbacks = Dict{AbstractString,Callback}() # name => args -> f(args...)
+const callbacks = Dict{String,Callback}() # name => args -> f(args...)
 
 # Empty callback to notify the Server that a new page is loaded and its WebSocket is ready.
 Callback("connected") do

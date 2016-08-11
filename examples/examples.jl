@@ -1,9 +1,11 @@
 using Pages,Blink
 
+using Compat; import Compat.readstring
+
 Pages.start()
 
 Endpoint("/examples/pages") do request::Request
-    open(readall,joinpath(dirname(@__FILE__),"PagesJL.html"))
+    readstring(joinpath(dirname(@__FILE__),"PagesJL.html"))
 end
 
 function example_pages()

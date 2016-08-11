@@ -1,10 +1,14 @@
 # Browser Window (Borrowed from Blink.jl)
-@osx_only     launch(x) = run(`open $x`)
-@linux_only   launch(x) = run(`xdg-open $x`)
-@windows_only launch(x) = run(`cmd /C start $x`)
+@static if is_apple()
+    launch(x) = run(`open $x`)
+elseif is_linux()
+    launch(x) = run(`xdg-open $x`)
+elseif is_windows()
+    launch(x) = run(`cmd /C start $x`)
+end
 
 # const connections = Dict{Int,WebSocket}() # WebSocket.id => WebSocket
-const conditions = Dict{AbstractString,Condition}()
+const conditions = Dict{String,Condition}()
 conditions["connected"] = Condition()
 conditions["unloaded"] = Condition()
 
@@ -16,7 +20,7 @@ end
 
 ws = WebSocketHandler() do request::Request, client::WebSocket
     while true
-        msg = JSON.parse(bytestring(read(client)))
+        msg = JSON.parse(String(read(client)))
         if haskey(sessions,msg["session_id"])
             session = sessions[msg["session_id"]]
             session.client = client
