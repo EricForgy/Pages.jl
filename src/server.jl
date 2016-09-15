@@ -13,7 +13,7 @@ conditions["connected"] = Condition()
 conditions["unloaded"] = Condition()
 
 Endpoint("/PagesJL.js") do request::Request, session::Session
-    d = Dict("session_id" => session.id,"port" => port)
+    d = Dict("session_id" => session.id,"host" => request.headers["Host"])
     template = Mustache.template_from_file(joinpath(dirname(@__FILE__),"..","res","PagesJL.js"))
     render(template,d)
 end
