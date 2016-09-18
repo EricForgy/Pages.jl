@@ -4,4 +4,5 @@ WebSockets
 URIParser
 Mustache
 JSON
+DataFrames
 Compat 0.8.6
