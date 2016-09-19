@@ -17,7 +17,7 @@ layout = Layout(;title = "Create a new <div> and plot a single trace",
     height = 300
 )
 id = "Plot1"
-Pages.add_div(id)
+Pages.add(Pages.Element(id=id))
 Pages.broadcast("script","""Plotly.newPlot("$(id)",$(data),$(layout));""")
 
 trace1 = scatter(;x = 1:n, y = rand(n))
@@ -28,7 +28,7 @@ layout = Layout(;title = "Create a new <div> and plot an array of traces",
     height = 300
 )
 id = "Plot2"
-Pages.add_div(id)
+Pages.add(Pages.Element(id=id))
 Pages.broadcast("script","""Plotly.newPlot("$(id)",$(data),$(layout));""")
 
 trace1 = scatter(;
@@ -54,7 +54,7 @@ layout = Layout(;
     width = 480)
 
 id = "Plot3"
-Pages.add_div(id)
+Pages.add(Pages.Element(id=id))
 Pages.broadcast("script","""Plotly.newPlot("$(id)",$(data));""")
 
 country = ["Switzerland (2011)", "Chile (2013)", "Japan (2014)",
@@ -99,7 +99,7 @@ layout = Layout(Dict{Symbol,Any}(:paper_bgcolor => "rgb(254, 247, 234)",
                 )
 
 id = "Plot4"
-Pages.add_div(id)
+Pages.add(Pages.Element(id=id))
 Pages.broadcast("script","""Plotly.newPlot("$(id)",$(data),$(layout));""")
 
 end

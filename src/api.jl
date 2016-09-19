@@ -78,24 +78,6 @@ type Element
     end
 end
 
-# function check(element::Element)
-#     io = IOBuffer()
-#     id = element.id
-#     tag = element.tag
-#     name = element.name
-#     parent = element.parent
-#     print(io,"""
-#         var $(name) = null;
-#         var check = document.getElementById("$(id)");
-#         if (check === null) {
-#             $(name) = parent.append("$(tag)").attr("id","$(id)");
-#         } else {
-#             $(name) = d3.select("#$(id)");
-#         };
-#     """)
-#     takebuf_string(io)
-# end
-
 function assign(io::IO,element::Element)
     # ==========================================================================
     # Add attributes to element
@@ -148,7 +130,7 @@ function add(element::Element)
     Pages.broadcast("script",add(IOBuffer(),element))
 end
 
-function append(io::IO,element::Element;parent = """d3.select("body");""")
+function append(io::IO,element::Element;parent = """d3.select("body")""")
     if isempty(element.name)
         print(io,"""
             $(parent).append("$(element.tag)");
@@ -162,13 +144,13 @@ function append(io::IO,element::Element;parent = """d3.select("body");""")
     takebuf_string(io)
 end
 
-function remove(io::IO,tag;parent = """d3.select("body");""")
+function remove(io::IO,tag;parent = """d3.select("body")""")
     print(io,"""
         $(parent).selectAll("$(tag)").remove();
     """)
     takebuf_string(io)
 end
-function remove(tag;parent = """d3.select("body");""")
+function remove(tag;parent = """d3.select("body")""")
     Pages.broadcast("script",remove(IOBuffer(),tag,parent=parent))
 end
 
