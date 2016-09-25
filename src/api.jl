@@ -99,7 +99,7 @@ function assign(io::IO,element::Element)
             """)
         end
     end
-    takebuf_string(io)
+    io
 end
 
 function add(io::IO,element::Element)
@@ -123,11 +123,10 @@ function add(io::IO,element::Element)
             $(element.name) = d3.select("$(element.parent)").append("$(element.tag)");
         """)
     end
-    print(io,assign(io,element))
-    takebuf_string(io)
+    assign(io,element)
 end
 function add(element::Element)
-    Pages.broadcast("script",add(IOBuffer(),element))
+    Pages.broadcast("script",takebuf_string(add(IOBuffer(),element)))
 end
 
 function append(io::IO,element::Element;parent = """d3.select("body")""")
@@ -140,24 +139,23 @@ function append(io::IO,element::Element;parent = """d3.select("body")""")
             $(element.name) = $(parent).append("$(element.tag)");
         """)
     end
-    print(io,assign(io,element))
-    takebuf_string(io)
+    assign(io,element)
 end
 
 function remove(io::IO,tag;parent = """d3.select("body")""")
     print(io,"""
         $(parent).selectAll("$(tag)").remove();
     """)
-    takebuf_string(io)
+    io
 end
 function remove(tag;parent = """d3.select("body")""")
-    Pages.broadcast("script",remove(IOBuffer(),tag,parent=parent))
+    Pages.broadcast("script",takebuf_string(remove(IOBuffer(),tag,parent=parent)))
 end
 
 function add_select(io::IO,options,element::Element)
     element.tag == "select" || error("Element must have tag = select.")
-    print(io,add(io,element))
-    print(io,remove(io,"option",parent=element.name))
+    add(io,element)
+    remove(io,"option",parent=element.name)
     # print(io,"""
     #     $(element.name).selectAll("option").remove();
     # """)
@@ -166,10 +164,10 @@ function add_select(io::IO,options,element::Element)
             $(element.name).append("option").attr("value","$(key)").text("$(options[key])");
         """)
     end
-    takebuf_string(io)
+    io
 end
 function add_select(options,element::Element)
-    Pages.broadcast("script",add_select(IOBuffer(),options,element))
+    Pages.broadcast("script",takebuf_string(add_select(IOBuffer(),options,element)))
 end
 
 function add_table(io::IO,df::DataFrame;table = Element(tag="table",name="table"),tr = Element(tag="tr",name="row"),th = Element(tag="th",name="header"),td = Element(tag="td",name="cell"))
@@ -177,20 +175,20 @@ function add_table(io::IO,df::DataFrame;table = Element(tag="table",name="table"
     tr.tag == "tr" || error("Element must have tag = tr.")
     th.tag == "th" || error("Element must have tag = th.")
     td.tag == "td" || error("Element must have tag = td.")
-    print(io,add(io,table))
-    print(io,remove(io,"tr",parent=table.name))
+    add(io,table)
+    remove(io,"tr",parent=table.name)
     # ==========================================================================
     # Add header
     print(io,"""
         var $(tr.name) = null;
     """)
-    print(io,append(io,tr,parent=table.name))
+    append(io,tr,parent=table.name)
     print(io,"""
         var $(th.name) = null;
     """)
     for name in names(df)
         th.html = string(name)
-        print(io,append(io,th,parent=tr.name))
+        append(io,th,parent=tr.name)
     end
     # ==========================================================================
     # Add data
@@ -199,14 +197,14 @@ function add_table(io::IO,df::DataFrame;table = Element(tag="table",name="table"
     """)
     for irow in 1:size(df,1)
         row = df[irow,:]
-        print(io,append(io,tr,parent=table.name))
+        append(io,tr,parent=table.name)
         for name in names(df)
             td.html = string(row[name][1])
-            print(io,append(io,td,parent=tr.name))
+            append(io,td,parent=tr.name)
         end
     end
-    takebuf_string(io)
+    io
 end
 function add_table(df::DataFrame;table = Element(tag="table",name="table"),tr = Element(tag="tr",name="row"),th = Element(tag="th",name="header"),td = Element(tag="td",name="cell"))
-    Pages.broadcast("script",add_table(IOBuffer(),df,table=table,tr=tr,th=th,td=td))
+    Pages.broadcast("script",takebuf_string(add_table(IOBuffer(),df,table=table,tr=tr,th=th,td=td)))
 end
