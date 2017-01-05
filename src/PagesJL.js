@@ -2,7 +2,7 @@
 
 var Pages = (function () {
 
-    var session_id = "{{session_id}}";
+    var route = window.location.pathname;
     var sock = new WebSocket('ws://{{host}}');
     sock.onmessage = function( message ){
         var msg = JSON.parse(message.data);
@@ -18,28 +18,25 @@ var Pages = (function () {
         }
     }
 
-    function notify(name) {
-        sock.send(JSON.stringify({"name":"notify","session_id":session_id,"args":name}))
-    }
-
-    function message(id,name,args) {
-        sock.send(JSON.stringify({"name":"message","session_id":session_id,"args":[id,name,args]}))
-    }
-
-    function broadcast(name,args) {
-        sock.send(JSON.stringify({"name":"broadcast","session_id":session_id,"args":[name,args]}))
-    }
-
     function callback(name,args) {
-        sock.send(JSON.stringify({"name":name,"session_id":session_id,"args":args}))
+        sock.send(JSON.stringify({"name":name,"route":route,"args":args}))
+    }
+    function notify(name) {
+        callback("notify",name);
+    }
+    function message(id,name,args) {
+        callback("message",[id,name,args]);
+    }
+    function broadcast(name,args) {
+        callback("broadcast",[name,args]);
     }
 
     sock.onopen = function () {
-        notify("connected");
+        callback("connected");
     };
 
     window.onbeforeunload = function () {
-        sock.send(JSON.stringify({"name":"unloaded","session_id":session_id,"args":session_id}))
+        callback("unloaded",route);
     };
 
     var addget = function (c, name) {

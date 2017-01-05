@@ -12,37 +12,27 @@ const conditions = Dict{String,Condition}()
 conditions["connected"] = Condition()
 conditions["unloaded"] = Condition()
 
-Endpoint("/PagesJL.js") do request::Request, session::Session
-    d = Dict("session_id" => session.id,"host" => request.headers["Host"])
-    template = Mustache.template_from_file(joinpath(dirname(@__FILE__),"..","res","PagesJL.js"))
+Endpoint("/PagesJL.js") do request::Request
+    d = Dict("host" => request.headers["Host"])
+    template = Mustache.template_from_file(joinpath(dirname(@__FILE__),"PagesJL.js"))
     render(template,d)
 end
 
 ws = WebSocketHandler() do request::Request, client::WebSocket
     while true
         msg = JSON.parse(String(read(client)))
-        if haskey(sessions,msg["session_id"])
-            session = sessions[msg["session_id"]]
-            session.client = client
-            haskey(msg,"args") ? callbacks[msg["name"]].callback(msg["args"]) : callbacks[msg["name"]].callback()
+        route = msg["route"]
+        if !haskey(pages[route].sessions,client.id)
+            pages[route].sessions[client.id] = client
         end
+        haskey(msg,"args") ? callbacks[msg["name"]].callback(client,msg["args"]) : callbacks[msg["name"]].callback(client)
     end
 end
 
 http = HttpHandler() do request::Request, response::Response
     route = URI(request.resource).path
     if haskey(pages,route)
-        if isequal(route,"/PagesJL.js")
-            if haskey(request.headers,"Referer")
-                referer = URI(request.headers["Referer"]).path
-                session = Session(referer)
-            else
-                session = Session()
-            end
-            res = Response(pages[route].handler(request,session))
-        else
-            res = Response(pages[route].handler(request))
-        end
+        res = Response(pages[route].handler(request))
     else
         res = "Page not found."
     end
