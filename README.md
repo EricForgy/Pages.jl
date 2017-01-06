@@ -1,5 +1,7 @@
 # Pages.jl
 
+[![Join the chat at https://gitter.im/Pages-jl/Lobby](https://badges.gitter.im/Pages-jl/Lobby.svg)](https://gitter.im/Pages-jl/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Build Status](https://travis-ci.org/EricForgy/Pages.jl.svg?branch=master)](https://travis-ci.org/EricForgy/Pages.jl)
 
 This a package designed to make playing around with (err... prototyping) web applications in Julia as easy as possible.
