@@ -2,8 +2,10 @@
 
 var Pages = (function () {
 
-    var route = window.location.pathname;
-    var sock = new WebSocket('ws://{{host}}');
+    var location = window.location,
+        route = location.pathname,
+        href = location.href;
+    var sock = new WebSocket(href.replace("http","ws"));
     sock.onmessage = function( message ){
         var msg = JSON.parse(message.data);
         var type = msg.type,

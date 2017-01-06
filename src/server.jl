@@ -13,9 +13,7 @@ conditions["connected"] = Condition()
 conditions["unloaded"] = Condition()
 
 Endpoint("/PagesJL.js") do request::Request
-    d = Dict("host" => request.headers["Host"])
-    template = Mustache.template_from_file(joinpath(dirname(@__FILE__),"PagesJL.js"))
-    render(template,d)
+    readstring(joinpath(dirname(@__FILE__),"PagesJL.js"))
 end
 
 ws = WebSocketHandler() do request::Request, client::WebSocket

@@ -1,11 +1,9 @@
-using Pages, Mustache, PlotlyJS
+using Pages, PlotlyJS
 
 Pages.start()
 
 Endpoint("/examples/plot.ly") do request::Request
-    d = Dict("host" => request.headers["Host"])
-    template = Mustache.template_from_file(joinpath(dirname(@__FILE__),"PagesJL.html"))
-    render(template,d)
+    readstring(joinpath(dirname(@__FILE__),"PagesJL.html"))
 end
 
 function example_plotly()
