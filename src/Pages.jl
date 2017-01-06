@@ -1,6 +1,6 @@
 module Pages
 
-using HttpServer, WebSockets, URIParser, Mustache, JSON, DataFrames
+using HttpServer, WebSockets, URIParser, JSON, DataFrames
 using Compat; import Compat: String, @static
 
 export Endpoint, Callback, Request, URI, query_params

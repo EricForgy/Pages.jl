@@ -7,12 +7,7 @@ if isdefined(Main, :IJulia) && Main.IJulia.inited
     # borrowed from https://github.com/plotly/plotly.py/blob/2594076e29584ede2d09f2aa40a8a195b3f3fc66/plotly/offline/offline.py#L64-L71
     # and https://github.com/JuliaLang/Interact.jl/blob/cc5f4cfd34687000bc6bc70f0513eaded1a7c950/src/IJulia/setup.jl#L15
     if !_js_loaded[1]
-        session = Session()
-        d = Dict("session_id" => session.id,"port" => port)
-        template = Mustache.template_from_file(joinpath(dirname(@__FILE__),"..","res","PagesJL.js"))
-        const _PagesJL_js = render(template,d)
-
-        # println(_PagesJL_js)
+        const _PagesJL_js = readstring(joinpath(dirname(@__FILE__),"PagesJL.js"))
 
         display("text/html", """
         <script charset="utf-8" type='text/javascript'>
