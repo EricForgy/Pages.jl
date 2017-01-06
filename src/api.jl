@@ -8,9 +8,8 @@ sock.onmessage = function( message ){
 }
 """
 function broadcast(msg::Dict)
-    for route in keys(pages)
-        page = pages[route]
-        for cid in keys(page.sessions)
+    for (route,page) in pages
+        for (cid,client) in page.sessions
             client = page.sessions[cid]
             if ~client.is_closed
                 write(client, json(msg))
@@ -36,10 +35,8 @@ function message(client::WebSocket,msg::Dict)
 end
 message(client::WebSocket,t,msg) = message(client,Dict("type"=>t,"data"=>msg))
 function message(id::Int,t,msg)
-    for route in keys(pages)
-        page = pages[route]
-        for cid in keys(page.sessions)
-            client = page.sessions[cid]
+    for (route,page) in pages
+        for (cid,client) in page.sessions
             if isequal(id,cid)
                 message(client,Dict("type"=>t,"data"=>msg))
             end
