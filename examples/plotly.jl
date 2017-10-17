@@ -11,7 +11,7 @@ Endpoint("/libs/plotly/1.16.1/plotly.min.js") do request::Request
 end
 
 Endpoint("/examples/plot.ly") do request::Request
-    readstring(joinpath(dirname(@__FILE__),"PagesJL.html"))
+    readstring(joinpath(dirname(@__FILE__),"pages.html"))
 end
 
 function example_plotly()

@@ -12,8 +12,8 @@ const conditions = Dict{String,Condition}()
 conditions["connected"] = Condition()
 conditions["unloaded"] = Condition()
 
-Endpoint("/PagesJL.js") do request::Request
-    readstring(joinpath(dirname(@__FILE__),"PagesJL.js"))
+Endpoint("/pages.js") do request::Request
+    readstring(joinpath(dirname(@__FILE__),"pages.js"))
 end
 
 ws = WebSocketHandler() do request::Request, client::WebSocket

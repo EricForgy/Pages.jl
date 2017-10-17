@@ -42,17 +42,17 @@ creates a web page at http://localhost:8000/hello that says `Hello world`. A dic
 julia> Pages.pages
 Dict{String,Pages.Endpoint} with 2 entries:
   "/hello"      => Endpoint created at /hello.
-  "/PagesJL.js" => Endpoint created at /PagesJL.js.
+  "/pages.js" => Endpoint created at /pages.js.
 ~~~
 
-Note there are two endpoints already. The one we just added plus `/PagesJL.js`. This endpoint is special and is part of Pages. It contains the JavaScript library that allows interaction between Julia and the browser. We'll discuss this in more detail below.
+Note there are two endpoints already. The one we just added plus `/pages.js`. This endpoint is special and is part of Pages. It contains the JavaScript library that allows interaction between Julia and the browser. We'll discuss this in more detail below.
 
 For safety reasons, if an endpoint is already created, Pages will throw an error if you try to create it again. For example, if we want to augment (from the REPL) the `Hello world` example above with url parameters, we'd need to first delete the old endpoint:
 
 ~~~julia
 julia> delete!(Pages.pages,"/hello")
 Dict{String,Pages.Endpoint} with 1 entry:
-  "/PagesJL.js" => Endpoint created at /PagesJL.js.
+  "/pages.js" => Endpoint created at /pages.js.
 
 julia> Endpoint("/hello") do request::Request
        uri = URI(request.resource)

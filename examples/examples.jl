@@ -5,7 +5,7 @@ using Compat; import Compat.readstring
 Pages.start()
 
 Endpoint("/examples/pages") do request::Request
-    readstring(joinpath(dirname(@__FILE__),"PagesJL.html"))
+    readstring(joinpath(dirname(@__FILE__),"pages.html"))
 end
 
 function example_pages()
@@ -13,7 +13,7 @@ function example_pages()
     for i = 1:nwin
         w = Window(Dict(:title => "Pages: Window #$i", :url => "http://localhost:8000/examples/pages"))
         tools(w)
-        wait(Pages.conditions["connected"])
+        # wait(Pages.conditions["connected"])
     end
 
     Pages.broadcast("say","Hello everyone!")
@@ -22,4 +22,4 @@ function example_pages()
         Pages.message(c,"say","You are connection #$(c.id).")
     end
 end
-example_pages()
+# example_pages()
