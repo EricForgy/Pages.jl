@@ -31,6 +31,8 @@ http = HttpHandler() do request::Request, response::Response
     route = URI(request.resource).path
     if haskey(pages,route)
         res = Response(pages[route].handler(request))
+    elseif haskey(public,dirname(route))
+        res = Response(public[dirname(route)].handler(request))
     else
         res = "Page not found."
     end
