@@ -14,6 +14,7 @@ const callbacks = Dict{String,Callback}() # name => args -> f(args...)
 # Empty callback to notify the Server that a new page is loaded and its WebSocket is ready.
 Callback("connected") do client
     println("New connection established (ID: $(client.id)).")
+    notify(conditions["connected"])
 end
 
 # Callback used to cleanup when the browser navigates away from the page.
