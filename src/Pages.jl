@@ -38,7 +38,7 @@ type Public
 end
 Public(route,path) = Public(route,path) do request::Request
     file = joinpath(path,basename(URI(request.resource).path))
-    isfile(file) && readstring(file)
+    isfile(file) ? readstring(file) : "File not found."
 end
 
 # function Base.show(io::Base.IO,public::Public)
