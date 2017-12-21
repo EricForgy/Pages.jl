@@ -11,7 +11,7 @@ function broadcast(msg::Dict)
     for (route,page) in pages
         for (cid,client) in page.sessions
             client = page.sessions[cid]
-            if ~client.is_closed
+            if isopen(client)
                 write(client, json(msg))
             end
         end
@@ -29,7 +29,7 @@ sock.onmessage = function( message ){
 }
 """
 function message(client::WebSocket,msg::Dict)
-    if ~client.is_closed
+    if isopen(client)
         write(client, json(msg))
     end
 end
@@ -67,7 +67,7 @@ function add_library(url)
     end
 end
 
-type Element
+mutable struct Element
     id::String
     tag::String
     name::String
@@ -130,7 +130,7 @@ function add(io::IO,element::Element)
     assign(io,element)
 end
 function add(element::Element)
-    Pages.broadcast("script",takebuf_string(add(IOBuffer(),element)))
+    Pages.broadcast("script",String(take!(add(IOBuffer(),element))))
 end
 
 function append(io::IO,element::Element;parent = """d3.select("body")""")
@@ -153,7 +153,7 @@ function remove(io::IO,tag;parent = """d3.select("body")""")
     io
 end
 function remove(tag;parent = """d3.select("body")""")
-    Pages.broadcast("script",takebuf_string(remove(IOBuffer(),tag,parent=parent)))
+    Pages.broadcast("script",String(take!(remove(IOBuffer(),tag,parent=parent))))
 end
 
 function add_select(io::IO,options,element::Element)
@@ -171,7 +171,7 @@ function add_select(io::IO,options,element::Element)
     io
 end
 function add_select(options,element::Element)
-    Pages.broadcast("script",takebuf_string(add_select(IOBuffer(),options,element)))
+    Pages.broadcast("script",String(take!(add_select(IOBuffer(),options,element))))
 end
 
 function add_table(io::IO,df::DataFrame;table = Element(tag="table",name="table"),tr = Element(tag="tr",name="row"),th = Element(tag="th",name="header"),td = Element(tag="td",name="cell"))
@@ -210,5 +210,5 @@ function add_table(io::IO,df::DataFrame;table = Element(tag="table",name="table"
     io
 end
 function add_table(df::DataFrame;table = Element(tag="table",name="table"),tr = Element(tag="tr",name="row"),th = Element(tag="th",name="header"),td = Element(tag="td",name="cell"))
-    Pages.broadcast("script",takebuf_string(add_table(IOBuffer(),df,table=table,tr=tr,th=th,td=td)))
+    Pages.broadcast("script",String(take!(add_table(IOBuffer(),df,table=table,tr=tr,th=th,td=td))))
 end

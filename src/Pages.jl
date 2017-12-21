@@ -3,7 +3,7 @@ module Pages
 using HttpServer, WebSockets, URIParser, JSON, DataFrames
 using Compat; import Compat: String, @static
 
-export Endpoint, Callback, Request, Response, URI, query_params
+export Endpoint, Callback, Request, Response, URI, query_params, launch
 
 type Endpoint
     handler::Function
