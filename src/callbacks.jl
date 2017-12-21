@@ -1,4 +1,4 @@
-type Callback
+mutable struct Callback
     callback::Function
     name::String
 

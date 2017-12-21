@@ -5,7 +5,7 @@ using Compat; import Compat: String, @static
 
 export Endpoint, Callback, Request, Response, URI, query_params, launch
 
-type Endpoint
+mutable struct Endpoint
     handler::Function
     route::String
     sessions::Dict{Int,WebSocket}
@@ -23,7 +23,7 @@ function Base.show(io::Base.IO,endpoint::Endpoint)
 end
 const pages = Dict{String,Endpoint}() # url => page
 
-type Public
+mutable struct Public
     handler::Function
     route::String
     path::String
