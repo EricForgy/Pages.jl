@@ -24,7 +24,7 @@ layout = Layout(;title = "Create a new <div> and plot a single trace",
 )
 id = "Plot1"
 Pages.add(Pages.Element(id=id))
-Pages.broadcast("script","""Plotly.newPlot("$(id)",$(data),$(layout));""")
+Pages.broadcast("script","""Plotly.newPlot("$(id)",$(data),$(layout),{displayModeBar: false});""")
 
 trace1 = scatter(;x = 1:n, y = rand(n))
 trace2 = scatter(;x = 1:n, y = rand(n))
@@ -35,7 +35,7 @@ layout = Layout(;title = "Create a new <div> and plot an array of traces",
 )
 id = "Plot2"
 Pages.add(Pages.Element(id=id))
-Pages.broadcast("script","""Plotly.newPlot("$(id)",$(data),$(layout));""")
+Pages.broadcast("script","""Plotly.newPlot("$(id)",$(data),$(layout),{displayModeBar: false});""")
 
 trace1 = scatter(;
     x = [1, 2, 3, 4],
@@ -56,12 +56,12 @@ data = [trace1, trace2, trace3]
 
 layout = Layout(;
     title = "Line and Scatter Plot",
-    height = 400,
-    width = 480)
+    height = 300,
+    width = 680)
 
 id = "Plot3"
 Pages.add(Pages.Element(id=id))
-Pages.broadcast("script","""Plotly.newPlot("$(id)",$(data));""")
+Pages.broadcast("script","""Plotly.newPlot("$(id)",$(data),$(layout),{displayModeBar: false});""")
 
 country = ["Switzerland (2011)", "Chile (2013)", "Japan (2014)",
            "United States (2012)", "Slovenia (2014)", "Canada (2011)",
@@ -106,7 +106,7 @@ layout = Layout(Dict{Symbol,Any}(:paper_bgcolor => "rgb(254, 247, 234)",
 
 id = "Plot4"
 Pages.add(Pages.Element(id=id))
-Pages.broadcast("script","""Plotly.newPlot("$(id)",$(data),$(layout));""")
+Pages.broadcast("script","""Plotly.newPlot("$(id)",$(data),$(layout),{displayModeBar: false});""")
 
 end
 
