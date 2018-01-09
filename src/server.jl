@@ -43,5 +43,5 @@ server = Server(http,ws)
 
 function start(p = 8000)
     global port = p
-    @async run(server, port)
+    run(server, port)
 end
