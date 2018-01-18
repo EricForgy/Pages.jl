@@ -1,24 +1,27 @@
-using Pages,Blink
+using PlotlyJS
 
-using Compat; import Compat.readstring
-
-Pages.start()
-
-Endpoint("/examples/pages") do request::Request
-    readstring(joinpath(dirname(@__FILE__),"pages.html"))
+Endpoint("/libs/plotly/1.16.1/plotly.min.js") do request::Request
+    readstring(joinpath(dirname(@__FILE__),"libs","plotly","v1.16.1","plotly.min.js"))
 end
 
-function example_pages()
-    nwin = 3
-    for i = 1:nwin
-        w = Window(Dict(:title => "Pages: Window #$i", :url => "http://localhost:8000/examples/pages"))
-        tools(w)
-        wait(Pages.conditions["connected"])
-    end
-
-    Pages.broadcast("say","Hello everyone!")
-    for (sid,s) in Pages.pages["/examples/pages"].sessions
-        Pages.message(s,"say","You are connection #$(s.id).")
-    end
+Endpoint("/libs/d3/4.2.1/d3.min.js") do request::Request
+    readstring(joinpath(dirname(@__FILE__),"libs","d3","v4.2.1","d3.min.js"))
 end
-# example_pages()
+
+Endpoint("/examples") do request::Request
+    readstring(joinpath(dirname(@__FILE__),"examples.html"))
+end
+
+include("plotly.jl")
+
+function examples()
+
+Endpoint("/examples/plot.ly") do request::Request
+    readstring(joinpath(dirname(@__FILE__),"plotly.html"))
+end
+
+@async Pages.start()
+sleep(2.0)
+Pages.launch("http://localhost:$(Pages.port)/examples")
+
+end

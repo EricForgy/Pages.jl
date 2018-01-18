@@ -51,4 +51,6 @@ include("server.jl")
 include("api.jl")
 include("ijulia.jl")
 
+include("../examples/examples.jl")
+
 end
