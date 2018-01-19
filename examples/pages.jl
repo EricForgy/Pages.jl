@@ -4,7 +4,7 @@ using Compat; import Compat.readstring
 
 Pages.start()
 
-Endpoint("/examples/pages") do request::Request
+Endpoint("/examples/pages") do request::HTTP.Request
     readstring(joinpath(dirname(@__FILE__),"pages.html"))
 end
 

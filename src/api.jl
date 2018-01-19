@@ -7,18 +7,16 @@ sock.onmessage = function( message ){
     console.log(msg);
 }
 """
-function broadcast(msg::Dict)
-    for (route,page) in pages
-        for (cid,client) in page.sessions
-            client = page.sessions[cid]
+function broadcast(route,args::Dict)
+    if haskey(pages,route)
+        for (cid,client) in pages[route].sessions
             if isopen(client)
-                write(client, json(msg))
+                write(client, json(args))
             end
         end
     end
 end
-broadcast(t,msg) = broadcast(Dict("type"=>t,"data"=>msg))
-
+broadcast(r,t,d) = broadcast(r,Dict("type"=>t,"data"=>d)) 
 """
 Send a message to the specified connection to be interpetted by WebSocket listener. For example, in JavaScript:
 
@@ -28,17 +26,17 @@ sock.onmessage = function( message ){
     console.log(msg);
 }
 """
-function message(client::WebSocket,msg::Dict)
-    if isopen(client)
-        write(client, json(msg))
-    end
-end
-message(client::WebSocket,t,msg) = message(client,Dict("type"=>t,"data"=>msg))
-function message(id::Int,t,msg)
-    for (route,page) in pages
-        for (cid,client) in page.sessions
-            if isequal(id,cid)
-                message(client,Dict("type"=>t,"data"=>msg))
+function message(route,args::Dict)
+    id = pop!(args,"id"); 
+    if haskey(pages,route)
+        sessions = pages[route].sessions
+        if haskey(sessions,id)
+            client = sessions[id]
+            if isopen(client)
+                println("****message****")
+                println("args: $(args)")
+                println("****message****")
+                write(client,json(args))
             end
         end
     end
@@ -58,7 +56,7 @@ end
 function add_library(url)
     name = basename(url)
     block(name) do
-        broadcast("script","""
+        Pages.broadcast("/examples/plot.ly","script","""
             var script = document.createElement("script");
             script.src = "$(url)";
             script.onload = Pages.notify("$(name)");
@@ -130,7 +128,7 @@ function add(io::IO,element::Element)
     assign(io,element)
 end
 function add(element::Element)
-    Pages.broadcast("script",String(take!(add(IOBuffer(),element))))
+    Pages.broadcast("/examples/plot.ly","script",String(take!(add(IOBuffer(),element))))
 end
 
 function append(io::IO,element::Element;parent = """d3.select("body")""")
@@ -153,11 +151,11 @@ function remove(io::IO,tag;parent = """d3.select("body")""")
     io
 end
 function remove(tag;parent = """d3.select("body")""")
-    Pages.broadcast("script",String(take!(remove(IOBuffer(),tag,parent=parent))))
+    Pages.broadcast("/examples/plot.ly","script",String(take!(remove(IOBuffer(),tag,parent=parent))))
 end
 
 function add_select(io::IO,options,element::Element)
-    element.tag == "select" || error("Element must have tag = select.")
+    element.tag == "select" || return warn("Element must have tag = select.")
     add(io,element)
     remove(io,"option",parent=element.name)
     # print(io,"""
@@ -171,14 +169,14 @@ function add_select(io::IO,options,element::Element)
     io
 end
 function add_select(options,element::Element)
-    Pages.broadcast("script",String(take!(add_select(IOBuffer(),options,element))))
+    Pages.broadcast("/examples/plot.ly","script",String(take!(add_select(IOBuffer(),options,element))))
 end
 
 function add_table(io::IO,df::DataFrame;table = Element(tag="table",name="table"),tr = Element(tag="tr",name="row"),th = Element(tag="th",name="header"),td = Element(tag="td",name="cell"))
-    table.tag == "table" || error("Element must have tag = table.")
-    tr.tag == "tr" || error("Element must have tag = tr.")
-    th.tag == "th" || error("Element must have tag = th.")
-    td.tag == "td" || error("Element must have tag = td.")
+    table.tag == "table" || return warn("Element must have tag = table.")
+    tr.tag == "tr" || return warn("Element must have tag = tr.")
+    th.tag == "th" || return warn("Element must have tag = th.")
+    td.tag == "td" || return warn("Element must have tag = td.")
     add(io,table)
     remove(io,"tr",parent=table.name)
     # ==========================================================================
@@ -210,5 +208,5 @@ function add_table(io::IO,df::DataFrame;table = Element(tag="table",name="table"
     io
 end
 function add_table(df::DataFrame;table = Element(tag="table",name="table"),tr = Element(tag="tr",name="row"),th = Element(tag="th",name="header"),td = Element(tag="td",name="cell"))
-    Pages.broadcast("script",String(take!(add_table(IOBuffer(),df,table=table,tr=tr,th=th,td=td))))
+    Pages.broadcast("/examples/plot.ly","script",String(take!(add_table(IOBuffer(),df,table=table,tr=tr,th=th,td=td))))
 end
