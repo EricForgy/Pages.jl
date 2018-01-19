@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="UTF-8">
+</head>
+<body>
+	<input type="text" placeholder="POST data" id="postData" value="Hello!"><br>
+	<button type="button" onclick="post()">POST</button>
+</body>
+</html>
+
+<script>
+	function post() {
+		var postData = document.getElementById("postData").value
+		console.log(postData)
+		fetch(window.location.href, {
+			method: 'post',
+			headers: {
+				"Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+			},
+			body: postData
+		})
+		.then(res => res.json())
+		.then(function (data) {
+			console.log('Request succeeded with JSON response', data);
+		})
+		.catch(function (error) {
+			console.log('Request failed', error);
+		});
+	}
+</script>
