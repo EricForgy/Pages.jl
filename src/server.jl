@@ -27,27 +27,26 @@ end
 #     end
 # end
 
-function is_upgrade(req::HTTP.Request)
-    is_get = req.method == "GET"
-    # "upgrade" for Chrome and "keep-alive, upgrade" for Firefox.
-    is_upgrade = HTTP.hasheader(req, "Connection", "upgrade")
-    is_websockets = HTTP.hasheader(req, "Upgrade", "websocket")
-    return is_get && is_upgrade && is_websockets
-end
-
-Base.convert(::Type{HTTP.Response},s::String) = HTTP.Response(200,s)
+# For external websocket connections not from a page served locally, e.g. IJulia
+const external = Dict{String,WebSocket}()
 
 function start(p = 8000)
     global port = p
     HTTP.listen(ip"127.0.0.1",p) do http
-        if is_upgrade(http.message)
+        if HTTP.WebSockets.is_upgrade(http.message)
             HTTP.WebSockets.upgrade(http) do client
                 while !eof(client);
                     data = String(readavailable(client))
                     msg = JSON.parse(data)
                     name = pop!(msg,"name"); route = pop!(msg,"route"); id = pop!(msg,"id")
-                    if !haskey(pages[route].sessions,id)
-                        pages[route].sessions[id] = client
+                    if haskey(pages,route)
+                        if !haskey(pages[route].sessions,id)
+                            pages[route].sessions[id] = client
+                        end
+                    else
+                        if !haskey(external,id)
+                            external[id] = client
+                        end
                     end
                     if haskey(callbacks,name)
                         callbacks[name].callback(client,route,id,msg)
@@ -55,7 +54,7 @@ function start(p = 8000)
                 end
             end
         else
-            route = http.message.target
+            route = HTTP.URI(http.message.target).path
             if haskey(pages,route)
                 HTTP.Servers.handle_request(pages[route].handler,http)
             else

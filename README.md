@@ -2,15 +2,27 @@
 
 [![][travis-img]][travis-url] [![][appveyor-img]][appveyor-url]
 
-This a package designed to help get started with web APIs some basic interaction between Julia and a browser.
+This is a package designed to help get started with web APIs and some basic interaction between Julia and a browser.
 
 ## Installation
+
+To get the latest tagged version, try:
 
 ~~~julia
 julia> Pkg.add("Pages")
 ~~~
 
+However, this package is still in early development and is likely to change often. To get the latest, try:
+
+~~~julia
+julia> Pkg.checkout("Pages")
+~~~
+
+Beware this version is likely going to depend on untagged versions of other packages.
+
 ## Introduction
+
+To get started, try the following:
 
 ~~~julia
 julia> using Pages
@@ -19,9 +31,9 @@ julia> @async Pages.start();
 Listening on 0.0.0.0:8000...
 ~~~
 
-When launched, Pages starts a server that is listening at http://localhost:8000 and exposes a few methods.
+This starts a server that is listening at http://localhost:8000 and exposes the `EndPoint` type with a few methods.
 
-The first:
+To create an `EndPoint`, try:
 
 ~~~julia
 julia> Endpoint("/hello") do request::Request
@@ -30,7 +42,9 @@ julia> Endpoint("/hello") do request::Request
 Endpoint created at /hello.
 ~~~
 
-creates a web page at http://localhost:8000/hello that says `Hello world`. A dictionary of endpoints is contained in
+This creates a web page at http://localhost:8000/hello that says `Hello world`. 
+
+You can see all current endpoints in
 
 ~~~julia
 julia> Pages.pages
@@ -41,7 +55,7 @@ Dict{String,Pages.Endpoint} with 2 entries:
 
 Note there are two endpoints already. The one we just added plus `/pages.js`. This endpoint is special and is part of Pages. It contains the JavaScript library that allows interaction between Julia and the browser. We'll discuss this in more detail below.
 
-One nice thing about using Pages is that we can create pages whenever and wherever we want in our Julia code. The remaining dictionaries and methods are probably best explained by way of an example.
+One nice thing about using `Pages` is that we can create pages whenever and wherever we want in our Julia code. 
 
 ## Examples
 
@@ -53,7 +67,45 @@ julia> Pages.examples()
 
 This will start a server and launch a browser open to a page with links to some examples.
 
-To be continued...
+Current examples include:
+
+  - `Plotly` - Dynamically insert plotly.js plots into a browser
+  - `Requests` - Send GET and POST requests from the browser to Julia and print the contents to the REPL.
+  - `Blank Page` - You can use this for experimemntation, e.g. use `Pages.add_library` to insert your favorite JavaScript library.
+
+You can reconstruct the `Plotly` example from the `Blank Page` via:
+
+```julia
+> Pages.add_library("https://cdn.plot.ly/plotly-1.16.1.min.js")
+> Pages.add_library("https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.1/d3.min.js")
+> Pages.example_plotly()
+```
+
+## Callbacks
+
+`Pages` comes with a small JavaScript library `pages.js` that allows communication between Julia and the browser as well as communication between browsers, e.g. chat, using WebSockets.
+
+For example, consider the function
+
+```julia
+function add_library(url)
+    name = basename(url)
+    block(name) do
+        Pages.broadcast("script","""
+            var script = document.createElement("script");
+            script.charset = "utf-8";
+            script.type = "text/javascript";
+            script.src = "$(url)";
+            script.onload = function() {
+                Pages.notify("$(name)");
+            };
+            document.head.appendChild(script);
+        """)
+    end
+end
+```
+
+This adds a library to the head of any connected web pages. However, Julia execution is blocked until the JavaScript library is successfully loaded and sends a notification back to Julia via a callback.
 
 ## Acknowledgements
 

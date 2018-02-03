@@ -1,10 +1,12 @@
+__precompile__()
+
 module Pages
 
-using HTTP, JSON, DataFrames
+using HTTP, JSON
 
 import HTTP.WebSockets.WebSocket
 
-export Endpoint, Callback
+export Endpoint, Callback, Plotly
 
 mutable struct Endpoint
     handler::Function
@@ -27,6 +29,7 @@ const pages = Dict{String,Endpoint}() # url => page
 include("callbacks.jl")
 include("server.jl")
 include("api.jl")
+include("displays/plotly.jl")
 # include("ijulia.jl")
 
 include("../examples/examples.jl")
