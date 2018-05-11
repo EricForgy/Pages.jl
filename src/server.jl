@@ -32,7 +32,7 @@ const external = Dict{String,WebSocket}()
 
 function start(p = 8000)
     global port = p
-    HTTP.listen(ip"127.0.0.1",p) do http
+    HTTP.listen(ip"0.0.0.0",p) do http
         if HTTP.WebSockets.is_upgrade(http.message)
             HTTP.WebSockets.upgrade(http) do client
                 while !eof(client);
