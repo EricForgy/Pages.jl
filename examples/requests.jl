@@ -1,20 +1,24 @@
 using JSON
 
 Endpoint("/examples/requests") do request::HTTP.Request
-    readstring(joinpath(dirname(@__FILE__),"requests.html"))
+    read(joinpath(@__DIR__,"requests.html"),String)
 end
 
-Endpoint("/examples/requests/echo") do request::HTTP.Request
-    if request.method == "GET"
-        params = HTTP.queryparams(HTTP.URI(request.target).query)
-        println("Body: $(params)")
-        response = JSON.json(params)
-    elseif request.method == "POST"
-        data = String(request.body)
-        println("Parameters: $(data)")
-        response = JSON.json(Dict(:data => data))
-    end
-    response
+Get("/examples/requests/echo") do request::HTTP.Request
+    params = HTTP.queryparams(HTTP.URI(request.target).query)
+    println("Body: $(params)")
+    response = JSON.json(params)
+end
+
+Post("/examples/requests/echo") do request::HTTP.Request
+    data = String(request.body)
+    println("Parameters: $(data)")
+    response = JSON.json(Dict(:data => data))
+end
+
+Get("/examples/variable/users/*") do request::HTTP.Request
+    name = replace(request.target,"/examples/variable/users/"=>"")
+    "Hi $(name)!"
 end
 
 # Endpoint("/api/math/rand") do request::HTTP.Request

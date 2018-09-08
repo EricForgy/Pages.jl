@@ -8,8 +8,8 @@ sock.onmessage = function( message ){
 }
 """
 function broadcast(route,args::Dict)
-    if haskey(pages,route)
-        for (cid,client) in pages[route].sessions
+    if haskey(connections,route)
+        for (cid,client) in connections[route]
             if isopen(client)
                 write(client, json(args))
             end
@@ -19,20 +19,17 @@ end
 broadcast(r,t,d) = broadcast(r,Dict("type"=>t,"data"=>d)) 
 
 function broadcast(args::Dict)
-    for key in keys(pages)
-        for (cid,client) in pages[key].sessions
+    for route in keys(connections)
+        for (cid,client) in connections[route]
             if isopen(client)
                 write(client, json(args))
             end
         end
     end
-    for (cid,client) in external
-        if isopen(client)
-            write(client, json(args))
-        end
-    end
 end
 broadcast(t,d) = broadcast(Dict("type"=>t,"data"=>d)) 
+broadcast(d) = broadcast(Dict("type"=>"say","data"=>d))
+
 """
 Send a message to the specified connection to be interpetted by WebSocket listener. For example, in JavaScript:
 
@@ -44,16 +41,15 @@ sock.onmessage = function( message ){
 """
 function message(route,args::Dict)
     id = pop!(args,"id"); 
-    if haskey(pages,route)
-        sessions = pages[route].sessions
-        if haskey(sessions,id)
-            client = sessions[id]
-            if isopen(client)
-                write(client,json(args))
-            end
+    if haskey(connections,route) && haskey(connections[route],id)
+        client = connections[route][id]
+        if isopen(client)
+            write(client,json(args))
         end
     end
 end
+message(route,mid,mtype,mdata) = message(route,Dict("id" => mid, "type" => mtype, "data" => mdata))
+message(route,mid,mdata) = message(route,Dict("id" => mid, "type" => "say", "data" => mdata))
 
 """
 Block Julia control flow until until callback["notify"](name) is called.

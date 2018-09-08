@@ -8,7 +8,7 @@ function ijulia()
         # and https://github.com/JuliaLang/Interact.jl/blob/cc5f4cfd34687000bc6bc70f0513eaded1a7c950/src/IJulia/setup.jl#L15
         if !_js_loaded[1]
 
-            const _pages_js = readstring(joinpath(dirname(@__FILE__),"pages.js"))
+            const _pages_js = read(joinpath(@__DIR__,"pages.js"),String)
 
             display("text/html", """
             <script charset="utf-8" type='text/javascript'>

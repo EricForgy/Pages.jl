@@ -50,11 +50,11 @@ var Pages = (function () {
     }
 
     window.onbeforeunload = function () {
+        callback("unloaded");
         if (sock) {
             sock.onclose = function () {};
             sock.close()    
         }
-        callback("unloaded");
     };
 
 	var addget = function (c, name) {

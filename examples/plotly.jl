@@ -1,15 +1,15 @@
 using PlotlyBase
 
 Endpoint("/libs/plotly/1.16.1/plotly.min.js") do request::HTTP.Request
-    readstring(joinpath(dirname(@__FILE__),"libs","plotly","v1.16.1","plotly.min.js"))
+    read(joinpath(@__DIR__,"libs","plotly","v1.16.1","plotly.min.js"),String)
 end
 
 Endpoint("/libs/d3/4.2.1/d3.min.js") do request::HTTP.Request
-    readstring(joinpath(dirname(@__FILE__),"libs","d3","v4.2.1","d3.min.js"))
+    read(joinpath(@__DIR__,"libs","d3","v4.2.1","d3.min.js"),String)
 end
 
 Endpoint("/examples/plot.ly") do request::HTTP.Request
-    readstring(joinpath(dirname(@__FILE__),"plotly.html"))
+    read(joinpath(@__DIR__,"plotly.html"),String)
 end
 
 function example_plotly()

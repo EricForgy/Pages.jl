@@ -1,30 +1,28 @@
-__precompile__()
-
 module Pages
 
-using HTTP, JSON
+using HTTP, JSON, Sockets
 
 import HTTP.WebSockets.WebSocket
 
-export Endpoint, Callback, Plotly
+export Endpoint, Get, Post, Callback
 
-mutable struct Endpoint
+const router = Ref{HTTP.Router}()
+
+struct Endpoint
     handler::Function
+    method::String
     route::String
-    sessions::Dict{String,WebSocket}
 
-    function Endpoint(handler,route)
-        p = new(handler,route,Dict{String,WebSocket}())
-        !haskey(pages,route) || warn("Page $route already exists.")
-        pages[route] = p
-        finalizer(p, p -> delete!(pages, p.route))
-        p
+    function Endpoint(handler,method,route)
+        HTTP.register!(router[],method,route,HTTP.HandlerFunction(handler))
+        new(handler,method,route)
     end
+
+    Endpoint(handler,route) = Endpoint(handler,"",route)
 end
-function Base.show(io::Base.IO,endpoint::Endpoint)
-    print(io,"Endpoint created at $(endpoint.route).")
-end
-const pages = Dict{String,Endpoint}() # url => page
+
+Get(handler,route) = Endpoint(handler,"GET",route)
+Post(handler,route) = Endpoint(handler,"POST",route)
 
 include("callbacks.jl")
 include("server.jl")
@@ -33,5 +31,9 @@ include("displays/plotly.jl")
 # include("ijulia.jl")
 
 include("../examples/examples.jl")
+
+function __init__()
+    router[] = HTTP.Router()
+end
 
 end

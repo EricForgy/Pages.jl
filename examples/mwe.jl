@@ -17,7 +17,7 @@ end
 
 @async HTTP.listen(ip"127.0.0.1", 8081,;
             ssl = true,
-            sslconfig = MbedTLS.SSLConfig(joinpath(dirname(@__FILE__),"cert.pem"), joinpath(dirname(@__FILE__),"key.pem"))) do http
+            sslconfig = MbedTLS.SSLConfig(joinpath(@__DIR__,"cert.pem"), joinpath(@__DIR__,"key.pem"))) do http
     if HTTP.WebSockets.is_upgrade(http.message)
 
         HTTP.WebSockets.upgrade(http) do client
@@ -31,7 +31,7 @@ end
         end
     else
         HTTP.Servers.handle_request(http) do req::HTTP.Request
-            HTTP.Response(200,readstring(joinpath(dirname(@__FILE__),"mwe.html")))
+            HTTP.Response(200,read(joinpath(@__DIR__,"mwe.html"),String))
         end
     end
 end

@@ -1,19 +1,13 @@
-Endpoint("/examples") do request::HTTP.Request
-    readstring(joinpath(dirname(@__FILE__),"examples.html"))
-end
-
-Endpoint("/examples/pages") do request::HTTP.Request
-    readstring(joinpath(dirname(@__FILE__),"pages.html"))
-end
-
-include("plotly.jl")
-include("requests.jl")
-# include("mwe.jl")
-
 function examples()
+    Endpoint("/examples") do request::HTTP.Request
+        read(joinpath(@__DIR__,"examples.html"),String)
+    end
 
-@async Pages.start()
-sleep(2.0)
-Pages.launch("http://localhost:$(Pages.port)/examples")
-
+    include(joinpath(@__DIR__,"plotly.jl"))
+    include(joinpath(@__DIR__,"requests.jl"))
+    include(joinpath(@__DIR__,"blank.jl"))
+    # include("mwe.jl")
+        
+    @async Pages.start()
+    Pages.launch("http://localhost:$(Pages.port)/examples")
 end
