@@ -34,7 +34,7 @@ This starts a server that is listening at http://localhost:8000 and exposes the 
 To create an `Endpoint`, try:
 
 ~~~julia
-julia> Endpoint("/hello") do request::Request
+julia> Endpoint("/hello") do request::HTTP.Request
           "Hello world"
        end
 ~~~

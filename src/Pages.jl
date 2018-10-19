@@ -4,7 +4,7 @@ using HTTP, JSON, Sockets
 
 import HTTP.WebSockets.WebSocket
 
-export Endpoint, Get, Post, Callback
+export Endpoint, Get, Post, Callback, HTTP
 
 const router = Ref{HTTP.Router}()
 
