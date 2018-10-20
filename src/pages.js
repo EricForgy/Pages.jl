@@ -73,5 +73,6 @@ var Pages = (function () {
     c = addget(c, "message");
     c = addget(c, "broadcast");
     c = addget(c, "callback");
+    c = addget(c, "id");
 	return c;
 })();
