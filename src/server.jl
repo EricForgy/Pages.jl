@@ -15,7 +15,7 @@ port = 8000
 function start(p = 8000)
     global port = p
 
-    Endpoint("/pages.js") do request::HTTP.Request
+    Get("/pages.js") do request::HTTP.Request
         read(joinpath(@__DIR__,"pages.js"),String)
     end
 
