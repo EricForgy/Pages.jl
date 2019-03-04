@@ -14,7 +14,7 @@ struct Endpoint
     route::String
 
     function Endpoint(handler,method,route)
-        HTTP.register!(router[],method,route,HTTP.HandlerFunction(handler))
+        HTTP.@register(router[],method,route,HTTP.Handlers.RequestHandlerFunction(handler))
         new(handler,method,route)
     end
 
