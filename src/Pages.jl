@@ -37,6 +37,10 @@ include("api.jl")
 
 include("../examples/examples.jl")
 
+symbol(m::Type{Method{M}}) where M = M
+
+Base.show(io::IO,m::Type{Method{M}}) where M = print(io,M)
+Base.show(io::IO,::MIME"text/plain",m::Type{Method{M}}) where M = print(io,M)
 
 function __init__()
     methods = ["GET","HEAD","POST","PUT","DELETE","CONNECT","OPTIONS","TRACE","PATCH"]
