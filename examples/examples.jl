@@ -4,10 +4,11 @@ function examples()
     end
 
     # include(joinpath(@__DIR__,"plotly.jl"))
-    include(joinpath(@__DIR__,"requests.jl"))
-    include(joinpath(@__DIR__,"blank.jl"))
+    include(joinpath(@__DIR__,"requests","requests.jl"))
+    include(joinpath(@__DIR__,"blank","blank.jl"))
     # include("mwe.jl")
-        
-    @async Pages.start()
-    Pages.launch("http://localhost:$(Pages.port)/examples")
+    
+    port = 8000
+    @async Pages.start(port)
+    # Pages.launch("http://localhost:$(port)/examples")
 end

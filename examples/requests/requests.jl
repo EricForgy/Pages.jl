@@ -4,19 +4,19 @@ Endpoint("/examples/requests") do request::HTTP.Request
     read(joinpath(@__DIR__,"requests.html"),String)
 end
 
-Get("/examples/requests/echo") do request::HTTP.Request
+Endpoint("/examples/requests/echo") do request::HTTP.Request
     params = HTTP.queryparams(HTTP.URI(request.target).query)
     println("Body: $(params)")
     response = JSON.json(params)
 end
 
-Post("/examples/requests/echo") do request::HTTP.Request
+Endpoint("/examples/requests/echo",POST) do request::HTTP.Request
     data = String(request.body)
     println("Parameters: $(data)")
     response = JSON.json(Dict(:data => data))
 end
 
-Get("/examples/variable/users/*") do request::HTTP.Request
+Endpoint("/examples/variable/users/*") do request::HTTP.Request
     name = replace(request.target,"/examples/variable/users/"=>"")
     "Hi $(name)!"
 end

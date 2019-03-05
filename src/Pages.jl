@@ -1,8 +1,9 @@
 module Pages
 
-using HTTP, JSON, Sockets
+using HTTP, JSON
 
-import HTTP.WebSockets.WebSocket
+import HTTP.WebSockets: WebSocket
+import HTTP.Sockets: @ip_str
 
 export Endpoint, endpoints, Callback, HTTP
 export GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH
@@ -10,23 +11,18 @@ export GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH
 struct Method{M} end
 
 struct Endpoint
-    handler::Function
+    handlers::Dict{Symbol,HTTP.RequestHandlerFunction}
     route::String
 
-    function Endpoint(handle,route,method=GET)
+    function Endpoint(handle,route,method::Type{Method{M}}=GET) where M
         route = lowercase(route)
         if haskey(endpoints,route)
             e = endpoints[route]
-            @eval Pages begin
-                $(e).handler(m::Type{$(method)}) = HTTP.RequestHandlerFunction($(handle))
-            end
+            e.handlers[M] = HTTP.RequestHandlerFunction(handle)
             return e
         else
-            function handler end
-            e = new(handler,route)
-            @eval Pages begin
-                $(e).handler(m::Type{$(method)}) = HTTP.RequestHandlerFunction($(handle))
-            end
+            handlers = Dict(M=>HTTP.RequestHandlerFunction(handle))
+            e = new(handlers,route)
             endpoints[route] = e
             return e
         end
@@ -35,11 +31,11 @@ end
 const endpoints = Dict{String,Endpoint}()
 # const sessions = Dict{String,WebSocket}()
 
-# include("callbacks.jl")
+include("callbacks.jl")
 include("server.jl")
-# include("api.jl")
+include("api.jl")
 
-# include("../examples/examples.jl")
+include("../examples/examples.jl")
 
 
 function __init__()
