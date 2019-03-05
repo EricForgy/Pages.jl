@@ -10,5 +10,4 @@ function examples()
     
     port = 8000
     @async Pages.start(port)
-    # Pages.launch("http://localhost:$(port)/examples")
 end
