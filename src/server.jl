@@ -11,11 +11,11 @@ const conditions = Dict{String,Condition}()
 conditions["connected"] = Condition()
 conditions["unloaded"] = Condition()
 
-port = 8000
-function start(p = 8000)
-    global port = p
+const port = Ref{Int}()
+function start(p=8000)
+    global port[] = p
 
-    Get("/pages.js") do request::HTTP.Request
+    Endpoint("/pages.js",GET) do request::HTTP.Request
         read(joinpath(@__DIR__,"pages.js"),String)
     end
 
@@ -32,7 +32,15 @@ function start(p = 8000)
                 end
             end
         else
-            HTTP.handle(router[],http)
+            route = lowercase(HTTP.URI(http.message.target).path)
+            if haskey(endpoints,route)
+                e = endpoints[route]
+                m = Method{Symbol(uppercase(http.message.method))}
+                HTTP.handle(e.handler(m),http)
+            else
+                HTTP.handle(HTTP.Handlers.FourOhFour,http)
+            end
         end
     end
+    return nothing
 end

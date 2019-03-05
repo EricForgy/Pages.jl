@@ -4,7 +4,6 @@ authors = ["Eric Forgy <Eric.Forgy@coherentasia.com>"]
 version = "0.2.2+"
 
 [deps]
-HTTP = "132d396a-9d4e-11e8-2bcf-fd61033e480f"
+HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
 JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
-PlotlyBase = "a03496cd-edff-5a9b-9e67-9cda94a718b5"
 Sockets = "6462fe0b-24de-5631-8697-dd941f90decc"
