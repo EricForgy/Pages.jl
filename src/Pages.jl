@@ -14,7 +14,7 @@ struct Endpoint
     handlers::Dict{Symbol,HTTP.RequestHandlerFunction}
     route::String
 
-    function Endpoint(handle,route,method::Type{Method{M}}=GET) where M
+    function Endpoint(handle,route,method::Method{M}=GET) where M
         route = lowercase(route)
         if haskey(endpoints,route)
             e = endpoints[route]
@@ -39,14 +39,12 @@ include("../examples/examples.jl")
 
 symbol(m::Type{Method{M}}) where M = M
 
-Base.show(io::IO,m::Type{Method{M}}) where M = print(io,M)
-Base.show(io::IO,::MIME"text/plain",m::Type{Method{M}}) where M = print(io,M)
+Base.show(io::IO,m::Method{M}) where M = print(io,M)
+Base.show(io::IO,::MIME"text/plain",m::Method{M}) where M = print(io,M)
 
-function __init__()
-    methods = ["GET","HEAD","POST","PUT","DELETE","CONNECT","OPTIONS","TRACE","PATCH"]
-    for method in methods
-        @eval Pages $(Symbol(method)) = Method{Symbol($(method))}
-    end
+methods = ["GET","HEAD","POST","PUT","DELETE","CONNECT","OPTIONS","TRACE","PATCH"]
+for method in methods
+    @eval Pages $(Symbol(method)) = Method{Symbol($(method))}()
 end
 
 end

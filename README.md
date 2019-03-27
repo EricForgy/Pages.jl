@@ -48,24 +48,21 @@ One nice thing about using `Pages` is that we can create pages whenever and wher
 There are a few examples included.
 
 ~~~julia
-julia> Pages.examples()
+julia> Pages.examples();
 ~~~
 
 This will start a server and launch a browser open to a page with links to some simple examples.
 
 Current examples include:
 
-  - `Plotly` - Dynamically insert plotly.js plots into a browser
-  - `Requests` - Send GET and POST requests from the browser to Julia and print the contents to the REPL.
-  - `Blank` - You can use this for experimemntation, e.g. use `Pages.add_library` to insert your favorite JavaScript library.
+  - Requests - Send GET and POST requests from the browser to Julia and print the contents to the REPL.
+  - Blank - You can use this for experimemntation, e.g. use `Pages.add_library` to insert your favorite JavaScript library.
+  - Random Ping - For this example, click the "Blank" link and run 
 
-You can reconstruct the `Plotly` example from the `Blank Page` via:
+  ```julia
+julia> Pages.randomping()
+  ```
 
-```julia
-> Pages.add_library("/libs/plotly/1.16.1/plotly.min.js")
-> Pages.add_library("/libs/d3/4.2.1/d3.min.js")
-> Pages.example_plotly()
-```
 
 ## Callbacks
 

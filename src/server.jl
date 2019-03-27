@@ -17,7 +17,7 @@ function start(p=8000)
         read(joinpath(@__DIR__,"pages.js"),String)
     end
 
-    HTTP.listen(ip"0.0.0.0",p) do http
+    HTTP.listen(ip"0.0.0.0", p, readtimeout=0) do http
         route = lowercase(HTTP.URI(http.message.target).path)
         if haskey(endpoints,route)
             if HTTP.WebSockets.is_upgrade(http.message)

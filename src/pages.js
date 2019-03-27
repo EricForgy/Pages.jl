@@ -1,6 +1,8 @@
 "use strict";
 
-var Pages = (function () {
+const Pages = (function () {
+
+    window.onload = function () { window.document.body.setAttribute('id','body') };
 
     var route = window.location.pathname;
     var sock = undefined;

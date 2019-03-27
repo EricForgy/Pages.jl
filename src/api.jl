@@ -66,16 +66,16 @@ end
 function add_library(url)
     name = basename(url)
     block(name) do
-        Pages.broadcast("script","""
-            var script = document.createElement("script");
-            script.charset = "utf-8";
-            script.type = "text/javascript";
-            script.src = "$(url)";
+        Pages.broadcast("script","
+            var script = document.createElement('script');
+            script.charset = 'utf-8';
+            script.type = 'text/javascript';
+            script.src = '$(url)';
             script.onload = function() {
-                Pages.notify("$(name)");
+                Pages.notify('$(name)');
             };
             document.head.appendChild(script);
-        """)
+        ")
     end
 end
 
@@ -83,108 +83,86 @@ mutable struct Element
     id::String
     tag::String
     name::String
-    attr::Dict{String,String}
+    attributes::Dict{String,String}
     style::Dict{String,String}
-    html::String
-    text::String
-    parent::String
+    innerHTML::String
+    parent_id::String
 
-    function Element(;id = "",tag = "div",name = "element",attr = Dict{String,String}(),style = Dict{String,String}(),html = "",text = "",parent = "body")
-        new(id,tag,name,attr,style,html,text,parent)
+    function Element(id::String;tag="div", name="element", attributes=Dict{String,String}(), style=Dict{String,String}(), innerHTML="", parent_id="body")
+        new(id,tag,name,attributes,style,innerHTML,parent_id)
     end
 end
 
 function assign(io::IO,element::Element)
-    # ==========================================================================
     # Add attributes to element
-    for prop in ["attr","style"]
-        field = getfield(element,Symbol(prop))
-        for key in keys(field)
-            print(io,"""
-                $(element.name).$(prop)("$(key)","$(field[key])");
-            """)
-        end
+    for (key,value) in element.attributes
+        print(io,"document.getElementById('$(element.id)').setAttribute('$(key)','$(value)');")
     end
-    # ==========================================================================
-    # Add html & text to element
-    for prop in ["html","text"]
-        field = getfield(element,Symbol(prop))
-        if !isempty(field)
-            print(io,"""
-                $(element.name).$(prop)("$(field)");
-            """)
-        end
+    # Add element style
+    ioStyle = IOBuffer()
+    for (key,value) in element.style
+        print(ioStyle,"$(key): $(value);")
     end
-    io
+    style = String(take!(ioStyle))
+    isempty(style) || print(io,"document.getElementById('$(element.id)').setAttribute('style','$(style)');")
+    # Add innerHTML to element
+    isempty(element.innerHTML) || print(io,"document.getElementById('$(element.id)').innerHTML = '$(element.innerHTML)';")
+    return io
 end
 
-function add(io::IO,element::Element)
-    # ==========================================================================
-    # Get or create element
-    print(io,"""
-        var parent = d3.select("$(element.parent)")
-        var $(element.name) = null;
-    """)
+function appendChild(io::IO,element::Element)
+    # Add element if it doesn't already exist
+    print(io,"
+        var parent = document.getElementById('$(element.parent_id)');
+    ")
     if !isempty(element.id)
-        print(io,"""
-            var check = document.getElementById("$(element.id)");
-            if (check === null) {
-                $(element.name) = parent.append("$(element.tag)").attr("id","$(element.id)");
-            } else {
-                $(element.name) = d3.select("#$(element.id)");
+        print(io,"
+            var element = document.getElementById('$(element.id)');
+            if (element === null) {
+                element = document.createElement('$(element.tag)');
+                element.setAttribute('id','$(element.id)');
+                parent.appendChild(element);
             };
-        """)
+        ")
     else
-        print(io,"""
-            $(element.name) = d3.select("$(element.parent)").append("$(element.tag)");
-        """)
+        print(io,"parent.appendChild(document.createElement('$(element.tag)'))")
     end
     assign(io,element)
 end
-function add(element::Element)
-    Pages.broadcast("script",String(take!(add(IOBuffer(),element))))
+function appendChild(element::Element)
+    script = String(take!(appendChild(IOBuffer(),element)))
+    Pages.broadcast("script",script)
 end
 
-function append(io::IO,element::Element;parent = """d3.select("body")""")
-    if isempty(element.name)
-        print(io,"""
-            $(parent).append("$(element.tag)");
-        """)
-    else
-        print(io,"""
-            $(element.name) = $(parent).append("$(element.tag)");
-        """)
-    end
-    assign(io,element)
+function removeChild(io::IO,id::String)
+    print(io,"
+        var element = document.getElementById('$(id)');
+        element.parentNode.removeChild(element);
+    ")
+    return io
+end
+function removeChild(id::String)
+    script = String(take!(removeChild(IOBuffer(),id)))
+    Pages.broadcast("script",script)
 end
 
-function remove(io::IO,tag;parent = """d3.select("body")""")
-    print(io,"""
-        $(parent).selectAll("$(tag)").remove();
-    """)
-    io
-end
-function remove(tag;parent = """d3.select("body")""")
-    Pages.broadcast("script",String(take!(remove(IOBuffer(),tag,parent=parent))))
-end
-
-function add_select(io::IO,options,element::Element)
-    element.tag == "select" || return warn("Element must have tag = select.")
-    add(io,element)
-    remove(io,"option",parent=element.name)
-    # print(io,"""
-    #     $(element.name).selectAll("option").remove();
-    # """)
-    for key in keys(options)
-        print(io,"""
-            $(element.name).append("option").attr("value","$(key)").text("$(options[key])");
-        """)
-    end
-    io
-end
-function add_select(options,element::Element)
-    Pages.broadcast("script",String(take!(add_select(IOBuffer(),options,element))))
-end
+# function add_select(io::IO,options,element::Element)
+#     element.tag == "select" || return warn("Element must have tag = select.")
+#     add(io,element)
+#     remove(io,"option",parent=element.name)
+#     # print(io,"""
+#     #     $(element.name).selectAll("option").remove();
+#     # """)
+#     for key in keys(options)
+#         print(io,"""
+#             $(element.name).append("option").attr("value","$(key)").text("$(options[key])");
+#         """)
+#     end
+#     io
+# end
+# function add_select(options,element::Element)
+#     Pages.broadcast("script",String(take!(add_select(IOBuffer(),options,element))))
+# end
 
 # function add_table(io::IO,df::DataFrame;table = Element(tag="table",name="table"),tr = Element(tag="tr",name="row"),th = Element(tag="th",name="header"),td = Element(tag="td",name="cell"))
 #     table.tag == "table" || return warn("Element must have tag = table.")
