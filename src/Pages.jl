@@ -46,5 +46,6 @@ methods = ["GET","HEAD","POST","PUT","DELETE","CONNECT","OPTIONS","TRACE","PATCH
 for method in methods
     @eval Pages $(Symbol(method)) = Method{Symbol($(method))}()
 end
+method(m::Method{S}) where {S} = S
 
 end
