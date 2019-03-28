@@ -1,7 +1,7 @@
 function _randomping()
 
     ping = true
-
+    
     function loop()
         count = 1
         t0 = time()
@@ -16,6 +16,8 @@ function _randomping()
     end
 
     function start()
+        ping = true
+
         @async loop()
         return
     end
