@@ -88,7 +88,7 @@ mutable struct Element
     innerHTML::String
     parent_id::String
 
-    function Element(id::String;tag="div", name="element", attributes=Dict{String,String}(), style=Dict{String,String}(), innerHTML="", parent_id="body")
+    function Element(;id,tag="div", name="element", attributes=Dict{String,String}(), style=Dict{String,String}(), innerHTML="", parent_id="body")
         new(id,tag,name,attributes,style,innerHTML,parent_id)
     end
 end
