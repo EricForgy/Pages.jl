@@ -48,7 +48,7 @@ One nice thing about using `Pages` is that we can create pages whenever and wher
 There are a few examples included.
 
 ~~~julia
-julia> Pages.examples();
+julia> Pages.examples(launch=true);
 ~~~
 
 This will start a server and launch a browser open to a page with links to some simple examples.
@@ -60,9 +60,16 @@ Current examples include:
   - Random Ping - For this example, click the "Blank" link and run 
 
   ```julia
-julia> Pages.randomping()
+julia> Pages.randomping.start()
   ```
 
+This puts you into an infinite loop insert text to the webpage.
+
+To stop the example, run
+
+```julia
+julia> Pages.randomping.stop()
+```
 
 ## Callbacks
 
