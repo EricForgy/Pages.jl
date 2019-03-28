@@ -93,7 +93,7 @@ mutable struct Element
     end
 end
 
-function assign(io::IO,element::Element)
+function update(io::IO,element::Element)
     # Add attributes to element
     for (key,value) in element.attributes
         print(io,"document.getElementById('$(element.id)').setAttribute('$(key)','$(value)');")
@@ -109,8 +109,12 @@ function assign(io::IO,element::Element)
     isempty(element.innerHTML) || print(io,"document.getElementById('$(element.id)').innerHTML = '$(element.innerHTML)';")
     return io
 end
+function update(element::Element)
+    script = String(take!(update(IOBuffer(),element)))
+    Pages.broadcast("script",script)
+end
 
-function appendChild(io::IO,element::Element)
+function append(io::IO,element::Element)
     # Add element if it doesn't already exist
     print(io,"
         var parent = document.getElementById('$(element.parent_id)');
@@ -127,22 +131,22 @@ function appendChild(io::IO,element::Element)
     else
         print(io,"parent.appendChild(document.createElement('$(element.tag)'))")
     end
-    assign(io,element)
+    update(io,element)
 end
-function appendChild(element::Element)
-    script = String(take!(appendChild(IOBuffer(),element)))
+function append(element::Element)
+    script = String(take!(append(IOBuffer(),element)))
     Pages.broadcast("script",script)
 end
 
-function removeChild(io::IO,id::String)
+function remove(io::IO,id::String)
     print(io,"
         var element = document.getElementById('$(id)');
         element.parentNode.removeChild(element);
     ")
     return io
 end
-function removeChild(id::String)
-    script = String(take!(removeChild(IOBuffer(),id)))
+function remove(id::String)
+    script = String(take!(remove(IOBuffer(),id)))
     Pages.broadcast("script",script)
 end
 

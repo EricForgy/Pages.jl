@@ -1,4 +1,4 @@
-function examples(;port=8000,launch=true)
+function examples(;port=8000,launch=false)
     Endpoint("/examples") do request::HTTP.Request
         read(joinpath(@__DIR__,"examples.html"),String)
     end
