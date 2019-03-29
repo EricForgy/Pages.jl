@@ -1,5 +1,5 @@
 """
-Broadcast a message to all connected web pages to be interpetted by WebSocket listener. For example, in JavaScript:
+Broadcast a message to all connected web pages to be interpreted by WebSocket listener. For example, in JavaScript:
 
 var sock = new WebSocket('ws://'+window.location.host);
 sock.onmessage = function( message ){
@@ -31,7 +31,7 @@ broadcast(t,d) = broadcast(Dict("type"=>t,"data"=>d))
 broadcast(d) = broadcast(Dict("type"=>"say","data"=>d))
 
 """
-Send a message to the specified connection to be interpetted by WebSocket listener. For example, in JavaScript:
+Send a message to the specified connection to be interpreted by WebSocket listener. For example, in JavaScript:
 
 var sock = new WebSocket('ws://'+window.location.host);
 sock.onmessage = function( message ){
