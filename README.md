@@ -45,13 +45,21 @@ One nice thing about using `Pages` is that we can create pages whenever and wher
 
 ## Examples
 
-There are a few examples included.
+There are a few examples included. The fastest way to see the examples is to run:
 
 ~~~julia
 julia> Pages.examples(launch=true);
 ~~~
 
-This will start a server and launch a browser open to a page with links to some simple examples.
+This will start a server and launch a browser open to a page with links to some simple examples. If you prefer not to open a browser to the page from the command line, you can instead run
+
+~~~julia
+julia> Pages.examples();
+~~~
+
+and then navigate to <http://localhost:8000/examples>.
+
+
 
 Current examples include:
 
@@ -63,7 +71,7 @@ Current examples include:
 julia> Pages.randomping.start()
   ```
 
-This puts you into an infinite loop insert text to the webpage.
+This puts you into an infinite loop inserting text to the webpage.
 
 To stop the example, run
 
@@ -71,31 +79,12 @@ To stop the example, run
 julia> Pages.randomping.stop()
 ```
 
-## Callbacks
+## Documentation
 
-`Pages` comes with a small JavaScript library `pages.js` that allows communication between Julia and the browser as well as communication between browsers, e.g. chat, using WebSockets.
+This package is sorely lacking documentation, but some of the additional features were recently explained on Discourse:
 
-For example, consider the function
+- [Sending a message to a webpage on event](https://discourse.julialang.org/t/sending-a-message-to-webpage-on-event/22391/4)
 
-```julia
-function add_library(url)
-    name = basename(url)
-    block(name) do
-        Pages.broadcast("script","""
-            var script = document.createElement("script");
-            script.charset = "utf-8";
-            script.type = "text/javascript";
-            script.src = "$(url)";
-            script.onload = function() {
-                Pages.notify("$(name)");
-            };
-            document.head.appendChild(script);
-        """)
-    end
-end
-```
-
-This adds a library to the head of any connected web pages. However, Julia execution is blocked until the JavaScript library is successfully loaded and sends a notification back to Julia via a callback.
 
 ## Acknowledgements
 
