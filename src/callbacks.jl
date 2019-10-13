@@ -44,6 +44,6 @@ Callback("notify") do client, route, id, data
     if haskey(conditions,name)
         notify(conditions[name])
     else
-        warn("""Condition "$name" was not found.""")
+        @warn "Condition '$name' was not found."
     end
 end
