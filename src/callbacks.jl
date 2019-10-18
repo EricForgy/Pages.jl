@@ -1,3 +1,11 @@
+module Callbacks
+
+import ..HTTP.WebSockets: WebSocket
+
+export callbacks, connections, conditions
+
+export Callback
+
 mutable struct Callback
     callback::Function
     name::String
@@ -9,8 +17,8 @@ mutable struct Callback
     end
 end
 const callbacks = Dict{String,Callback}() # name => args -> f(args...)
-
 const connections = Dict{String,Dict{String,WebSocket}}()
+const conditions = Dict{String,Condition}()
 
 # Callback to notify the Server that a new page is loaded and its WebSocket is ready.
 Callback("connected") do client, route, id, data
@@ -46,4 +54,6 @@ Callback("notify") do client, route, id, data
     else
         @warn "Condition '$name' was not found."
     end
+end
+
 end

@@ -1,72 +1,15 @@
-"""
-Broadcast a message to all connected web pages to be interpreted by WebSocket listener. For example, in JavaScript:
+module DOM
 
-var sock = new WebSocket('ws://'+window.location.host);
-sock.onmessage = function( message ){
-    var msg = JSON.parse(message.data);
-    console.log(msg);
-}
-"""
-function broadcast(route,args::Dict)
-    if haskey(connections,route)
-        for (cid,client) in connections[route]
-            if isopen(client)
-                write(client, json(args))
-            end
-        end
-    end
-end
-broadcast(r,t,d) = broadcast(r,Dict("type"=>t,"data"=>d)) 
+using ..Pages
+import Pages: broadcast
 
-function broadcast(args::Dict)
-    for route in keys(connections)
-        for (cid,client) in connections[route]
-            if isopen(client)
-                write(client, json(args))
-            end
-        end
-    end
-end
-broadcast(t,d) = broadcast(Dict("type"=>t,"data"=>d)) 
-broadcast(d) = broadcast(Dict("type"=>"say","data"=>d))
-
-"""
-Send a message to the specified connection to be interpreted by WebSocket listener. For example, in JavaScript:
-
-var sock = new WebSocket('ws://'+window.location.host);
-sock.onmessage = function( message ){
-    var msg = JSON.parse(message.data);
-    console.log(msg);
-}
-"""
-function message(route,args::Dict)
-    id = pop!(args,"id"); 
-    if haskey(connections,route) && haskey(connections[route],id)
-        client = connections[route][id]
-        if isopen(client)
-            write(client,json(args))
-        end
-    end
-end
-message(route,mid,mtype,mdata) = message(route,Dict("id" => mid, "type" => mtype, "data" => mdata))
-message(route,mid,mdata) = message(route,Dict("id" => mid, "type" => "say", "data" => mdata))
-
-"""
-Block Julia control flow until until callback["notify"](name) is called.
-"""
-function block(f::Function,name)
-    conditions[name] = Condition()
-    f()
-    wait(conditions[name])
-    delete!(conditions,name)
-    return nothing
-end
+export Element, update, append, remove, add_library
 
 """Add a JS library to the current page from a url."""
 function add_library(url)
     name = basename(url)
     block(name) do
-        Pages.broadcast("script","
+        broadcast("script","
             var script = document.createElement('script');
             script.charset = 'utf-8';
             script.type = 'text/javascript';
@@ -111,7 +54,7 @@ function update(io::IO,element::Element)
 end
 function update(element::Element)
     script = String(take!(update(IOBuffer(),element)))
-    Pages.broadcast("script",script)
+    broadcast("script",script)
 end
 
 function append(io::IO,element::Element)
@@ -135,7 +78,7 @@ function append(io::IO,element::Element)
 end
 function append(element::Element)
     script = String(take!(append(IOBuffer(),element)))
-    Pages.broadcast("script",script)
+    broadcast("script",script)
 end
 
 function remove(io::IO,id::String)
@@ -147,7 +90,7 @@ function remove(io::IO,id::String)
 end
 function remove(id::String)
     script = String(take!(remove(IOBuffer(),id)))
-    Pages.broadcast("script",script)
+    broadcast("script",script)
 end
 
 # function add_select(io::IO,options,element::Element)
@@ -165,7 +108,7 @@ end
 #     io
 # end
 # function add_select(options,element::Element)
-#     Pages.broadcast("script",String(take!(add_select(IOBuffer(),options,element))))
+#     broadcast("script",String(take!(add_select(IOBuffer(),options,element))))
 # end
 
 # function add_table(io::IO,df::DataFrame;table = Element(tag="table",name="table"),tr = Element(tag="tr",name="row"),th = Element(tag="th",name="header"),td = Element(tag="td",name="cell"))
@@ -204,5 +147,7 @@ end
 #     io
 # end
 # function add_table(df::DataFrame;table = Element(tag="table",name="table"),tr = Element(tag="tr",name="row"),th = Element(tag="th",name="header"),td = Element(tag="td",name="cell"))
-#     Pages.broadcast("script",String(take!(add_table(IOBuffer(),df,table=table,tr=tr,th=th,td=td))))
+#     broadcast("script",String(take!(add_table(IOBuffer(),df,table=table,tr=tr,th=th,td=td))))
 # end
+
+end

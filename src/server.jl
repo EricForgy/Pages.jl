@@ -1,3 +1,12 @@
+module Server
+
+using ..Pages
+import Pages.Endpoints: endpoints
+import Pages.Callbacks: callbacks, conditions
+import HTTP.Sockets: @ip_str
+
+export launch, start
+
 # Browser Window (Borrowed from Blink.jl)
 @static if Sys.isapple()
     launch(x) = run(`open $x`)
@@ -7,7 +16,6 @@ elseif Sys.iswindows()
     launch(x) = run(`cmd /C start $x`)
 end
 
-const conditions = Dict{String,Condition}()
 conditions["connected"] = Condition()
 conditions["unloaded"] = Condition()
 
@@ -43,4 +51,6 @@ function start(p=8000)
         end
     end
     return nothing
+end
+
 end

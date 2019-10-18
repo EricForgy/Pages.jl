@@ -7,9 +7,11 @@ function _randomping()
         t0 = time()
         while ping
             sleep(1)
-            e = Element(id = string(count),innerHTML = "Ping $(count): $(round(time()-t0,digits=2)) seconds")
+            msg = "Ping $(count): $(round(time()-t0,digits=2)) seconds"
+            e = Pages.Element(id = string(count),innerHTML = msg)
             e.style["color"] = rand(["red","green","blue"])
             rand() < .5 && Pages.append(e)
+
             count += 1
             tstart = time()
         end
