@@ -2,7 +2,7 @@ module Endpoints
 
 using ..Pages
 
-export Endpoint
+export Endpoint, servefile, servefolder
 export GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH
 
 struct Method{M} end
@@ -37,5 +37,28 @@ for method in methods
     @eval Endpoints $(Symbol(method)) = Method{Symbol($(method))}()
 end
 method(m::Method{S}) where {S} = S
+
+function servefile(filepath,root="/")
+    if isfile(filepath)
+        file = basename(filepath)
+        if isequal(lowercase(file),"index.html") || isequal(lowercase(file),"index.htm")
+            Endpoint(root) do request::HTTP.Request
+                read(filepath,String)
+            end
+        end
+        Endpoint("$(root)/$(file)") do request::HTTP.Request
+            read(filepath,String)
+        end
+    else
+        @warn "$(filepath) not found."
+    end
+end
+
+function servefolder(folder,root="/")
+    for file in readdir(folder)
+        filepath = joinpath(folder,file)
+        servefile(filepath,root)
+    end
+end
 
 end

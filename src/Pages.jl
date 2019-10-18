@@ -1,6 +1,6 @@
 module Pages
 
-using HTTP, JSON
+using HTTP, JSON, Documenter
 
 export Endpoint, HTTP, JSON
 export GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH
@@ -11,6 +11,7 @@ include("Server.jl"); using .Server
 include("Messaging.jl"); using .Messaging
 const broadcast = Messaging.broadcast
 include("DOM.jl"); using .DOM
+include("Docs.jl"); using .Docs
 
 include("Examples/Examples.jl"); using .Examples
 
