@@ -68,7 +68,7 @@ Current examples include:
   - Random Ping - For this example, click the "Blank" link and run 
 
   ```julia
-julia> Pages.randomping.start()
+julia> Pages.Examples.randomping.start()
   ```
 
 This puts you into an infinite loop inserting text to the webpage.
@@ -76,7 +76,7 @@ This puts you into an infinite loop inserting text to the webpage.
 To stop the example, run
 
 ```julia
-julia> Pages.randomping.stop()
+julia> Pages.Examples.randomping.stop()
 ```
 
 ## Documentation

@@ -32,7 +32,7 @@ function examples(;port=8000,launch=false)
     include(joinpath(@__DIR__,"blank","blank.jl"))
     include(joinpath(@__DIR__,"randomping","randomping.jl"))
 
-    @async Pages.start()
+    @async Pages.start(port)
     launch && Pages.launch("http://localhost:$(port)/examples")
     return
 end

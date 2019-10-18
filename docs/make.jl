@@ -1,3 +1,3 @@
 using Documenter, Pages
 
-makedocs(sitename="Pages.jl",build="")
+Documenter.makedocs(sitename="Pages.jl",build="")
