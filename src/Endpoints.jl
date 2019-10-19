@@ -2,7 +2,7 @@ module Endpoints
 
 using ..Pages
 
-export Endpoint, servefile, servefolder
+export Endpoint, endpoints, method, servefile, servefolder
 export GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH
 
 struct Method{M} end

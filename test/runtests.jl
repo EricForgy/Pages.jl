@@ -6,7 +6,7 @@ for m in methods
     Endpoint("/hello",m) do request::HTTP.Request
         string(m)
     end
-    e = endpoints["/hello"]
+    e = Pages.endpoints["/hello"]
     @test HTTP.handle(e.handlers[Pages.method(m)],HTTP.Request()) === string(m)
 end
 
