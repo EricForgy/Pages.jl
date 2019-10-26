@@ -2,7 +2,7 @@ module Pages
 
 using HTTP, JSON, Documenter
 
-export Endpoint, HTTP, JSON
+export Endpoint, HTTP, JSON, Documenter
 export GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH
 
 include("Endpoints.jl"); using .Endpoints

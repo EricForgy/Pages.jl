@@ -1,6 +1,6 @@
 # Pages.jl
 
-[![][travis-img]][travis-url] [![][appveyor-img]][appveyor-url]
+[![Travis][travis-img]][travis-url] [![Appveyor][appveyor-img]][appveyor-url]
 
 This is a package designed to help get started with web APIs and some basic interaction between Julia and a browser.
 
