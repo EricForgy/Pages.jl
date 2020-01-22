@@ -16,13 +16,13 @@ function examples(;port=8000,launch=false)
     Endpoint("/examples/requests/echo") do request::HTTP.Request
         params = HTTP.queryparams(HTTP.URI(request.target).query)
         println("Body: $(params)")
-        response = JSON.json(params)
+        response = JSON3.write(params)
     end
 
     Endpoint("/examples/requests/echo",POST) do request::HTTP.Request
         data = String(request.body)
         println("Parameters: $(data)")
-        response = JSON.json(Dict(:data => data))
+        response = JSON3.write(Dict(:data => data))
     end
 
     Endpoint("/examples/blank") do request::HTTP.Request
@@ -32,7 +32,7 @@ function examples(;port=8000,launch=false)
     include(joinpath(@__DIR__,"blank","blank.jl"))
     include(joinpath(@__DIR__,"randomping","randomping.jl"))
 
-    @async Pages.start(port)
+    Pages.start(port=port)
     launch && Pages.launch("http://localhost:$(port)/examples")
     return
 end

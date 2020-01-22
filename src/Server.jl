@@ -19,20 +19,20 @@ end
 conditions["connected"] = Condition()
 conditions["unloaded"] = Condition()
 
-function start(p=8000)
+function start(;port=8000)
 
     Endpoint("/pages.js",GET) do request::HTTP.Request
         read(joinpath(@__DIR__,"pages.js"),String)
     end
 
-    HTTP.listen(ip"0.0.0.0", p, readtimeout=0) do http
+    HTTP.listen(ip"0.0.0.0", port, readtimeout=0) do http
         route = lowercase(HTTP.URI(http.message.target).path)
         if haskey(endpoints,route)
             if HTTP.WebSockets.is_upgrade(http.message)
                 HTTP.WebSockets.upgrade(http) do client
                     while !eof(client);
                         data = String(readavailable(client))
-                        msg = JSON.parse(data)
+                        msg = JSON3.read(data)
                         name = pop!(msg,"name")
                         route = pop!(msg,"route")
                         id = pop!(msg,"id")
