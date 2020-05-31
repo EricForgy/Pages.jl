@@ -10,7 +10,7 @@ Broadcast a message to all connected web pages to be interpreted by WebSocket li
 
 var sock = new WebSocket('ws://'+window.location.host);
 sock.onmessage = function( message ){
-    var msg = JSON.parse(message.data);
+    var msg = JSON3.read(message.data);
     console.log(msg);
 }
 """
@@ -18,7 +18,7 @@ function broadcast(route,args::Dict)
     if haskey(connections,route)
         for (cid,client) in connections[route]
             if isopen(client)
-                write(client, JSON.json(args))
+                write(client, JSON3.write(args))
             end
         end
     end
@@ -29,7 +29,7 @@ function broadcast(args::Dict)
     for route in keys(connections)
         for (cid,client) in connections[route]
             if isopen(client)
-                write(client, JSON.json(args))
+                write(client, JSON3.write(args))
             end
         end
     end
@@ -42,7 +42,7 @@ Send a message to the specified connection to be interpreted by WebSocket listen
 
 var sock = new WebSocket('ws://'+window.location.host);
 sock.onmessage = function( message ){
-    var msg = JSON.parse(message.data);
+    var msg = JSON3.read(message.data);
     console.log(msg);
 }
 """
@@ -51,7 +51,7 @@ function message(route,args::Dict)
     if haskey(connections,route) && haskey(connections[route],id)
         client = connections[route][id]
         if isopen(client)
-            write(client,JSON.json(args))
+            write(client,JSON3.write(args))
         end
     end
 end

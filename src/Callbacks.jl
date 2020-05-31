@@ -1,5 +1,7 @@
 module Callbacks
 
+import .. Pages
+
 import ..HTTP.WebSockets: WebSocket
 
 export callbacks, connections, conditions
@@ -43,7 +45,7 @@ end
 
 # Callback used to broadcast to all connected browsers.
 Callback("broadcast") do client, route, id, data
-    broadcast(route,data["args"])
+    Pages.broadcast(route,data["args"])
 end
 
 # Callback used for blocking Julia control flow until notified by the WebSocket.
